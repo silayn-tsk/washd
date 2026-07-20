@@ -336,6 +336,153 @@ h1 em, h2 em { color: #4f83ed; font-weight: 390; }
 .booking-success > div:first-child { width: 72px; height: 72px; margin: 0 auto 24px; border-radius: 50%; display: grid; place-items: center; color: white; background: #719e6b; }
 .booking-success h2 { margin-left: auto; margin-right: auto; }
 
+/* Member authentication, subscriptions and account */
+.member-header {
+  height: 88px;
+  padding: 0 clamp(22px, 6vw, 92px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  background: rgba(251,250,246,.92);
+  backdrop-filter: blur(18px);
+  position: relative;
+  z-index: 10;
+}
+.member-header nav { display: flex; align-items: center; gap: 28px; font-size: 13px; font-weight: 580; }
+.member-pill { padding: 11px 18px; color: white; background: var(--ink); border-radius: 999px; }
+.member-page { min-height: 100vh; background: var(--paper); }
+
+.auth-page { min-height: 100vh; display: grid; grid-template-columns: minmax(420px, .95fr) 1.05fr; background: white; }
+.auth-story { min-height: 100vh; padding: 44px clamp(34px, 5vw, 78px); position: relative; overflow: hidden; color: white; background: linear-gradient(145deg,#17353d,#244f58); display: flex; flex-direction: column; }
+.auth-brand { color: white; position: relative; z-index: 3; }
+.auth-brand .brand-mark { background: var(--gold); color: var(--ink); }
+.auth-story-copy { margin: auto 0; max-width: 590px; position: relative; z-index: 3; }
+.auth-story-copy h1 { font-size: clamp(60px,6.2vw,96px); line-height: .92; letter-spacing: -.065em; font-weight: 420; margin: 25px 0; }
+.auth-story-copy h1 em { color: var(--gold-soft); font-family: Georgia,serif; font-weight: 400; }
+.auth-story-copy > p { color: rgba(255,255,255,.6); font-size: 17px; line-height: 1.7; max-width: 520px; }
+.auth-benefits { display: flex; gap: 14px; margin-top: 34px; flex-wrap: wrap; }
+.auth-benefits span { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.06); border-radius: 999px; padding: 10px 14px; font-size: 11px; }
+.auth-benefits svg { color: var(--gold); }
+.auth-orbit { position: absolute; width: 570px; height: 570px; border: 1px solid rgba(255,255,255,.08); border-radius: 50%; right: -260px; bottom: -160px; box-shadow: 0 0 0 60px rgba(255,255,255,.025),0 0 0 120px rgba(255,255,255,.018); }
+.auth-orbit span { position: absolute; width: 23px; height: 23px; border-radius: 50%; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.25); animation: bubble-float 5s ease-in-out infinite; }
+.auth-orbit span:first-child { top: 30px; left: 90px; }
+.auth-orbit span:nth-child(2) { width: 11px; height: 11px; top: 160px; left: -20px; animation-delay: 1s; }
+.auth-orbit span:last-child { width: 36px; height: 36px; right: 80px; top: 130px; animation-delay: .5s; }
+.auth-form-side { display: grid; place-items: center; padding: 50px 25px; background: var(--paper); }
+.auth-form-card { width: min(440px,100%); }
+.auth-mobile-logo { display: none; }
+.auth-form-card h2 { font: 600 clamp(42px,4vw,58px)/1 Georgia,serif; letter-spacing: -.04em; margin: 18px 0 12px; }
+.auth-form-card > p { color: #74868b; line-height: 1.6; margin: 0 0 29px; }
+.auth-form-card form, .signup-card form { display: grid; gap: 17px; }
+.auth-form-card label, .signup-card label { display: flex; flex-direction: column; gap: 8px; font-size: 11px; font-weight: 680; }
+.auth-form-card input, .signup-card input { width: 100%; border: 1px solid var(--line); border-radius: 12px; background: white; padding: 15px; outline: none; color: var(--ink); }
+.auth-form-card input:focus, .signup-card input:focus { border-color: #7798a0; box-shadow: 0 0 0 3px rgba(23,53,61,.08); }
+.password-field { position: relative; display: block; }
+.password-field input { padding-right: 50px; }
+.password-field button { position: absolute; right: 7px; top: 50%; transform: translateY(-50%); width: 38px; height: 38px; display: grid; place-items: center; border: 0; background: transparent; cursor: pointer; color: #61767c; }
+.gold-button { background: var(--gold); color: var(--ink); box-shadow: 0 13px 28px rgba(160,131,64,.2); margin-top: 3px; }
+.gold-button:hover { color: white; background: var(--ink); }
+.button:disabled, .demo-button:disabled, .text-button:disabled { opacity: .58; cursor: wait; transform: none; }
+.demo-button { width: 100%; margin: 18px 0 6px; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 0; background: transparent; cursor: pointer; font-size: 12px; }
+.auth-links { display: flex; align-items: center; justify-content: center; gap: 22px; font-size: 12px; }
+.auth-links a, .auth-links button { border: 0; background: transparent; padding: 7px 0; cursor: pointer; }
+.auth-links a:hover, .auth-links button:hover { text-decoration: underline; }
+.secure-note { color: #8a999c; display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 27px; font-size: 9px; }
+.form-alert { border-radius: 11px; padding: 12px 14px; font-size: 11px; line-height: 1.5; }
+.form-alert.error, .checkout-banner.error { color: #923f3f; background: #f9e7e5; border: 1px solid #edc8c4; }
+.form-alert.success, .checkout-banner.success { color: #41683d; background: #e8f3e5; border: 1px solid #cadfc6; }
+
+.signup-page { min-height: 100vh; padding: 35px clamp(20px,5vw,75px) 70px; background: linear-gradient(145deg,#eef6ff,#f9f7f0 55%,#ece8da); }
+.signup-brand { margin-bottom: 34px; }
+.signup-card { width: min(1100px,100%); margin: 0 auto; display: grid; grid-template-columns: .9fr 1.1fr; gap: clamp(40px,8vw,110px); align-items: center; padding: clamp(30px,5vw,68px); border-radius: 30px; background: rgba(255,255,255,.82); border: 1px solid white; box-shadow: 0 30px 70px rgba(64,87,87,.12); }
+.signup-intro h1 { font-size: clamp(45px,5.3vw,70px); line-height: .96; letter-spacing: -.06em; font-weight: 440; margin: 20px 0; }
+.signup-intro > p { color: #71858a; line-height: 1.7; }
+.signup-intro ul { padding: 0; list-style: none; display: grid; gap: 13px; margin-top: 30px; }
+.signup-intro li { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.signup-intro li svg { color: #6c9564; }
+.form-foot { text-align: center; color: #71858a; font-size: 11px; }
+.form-foot a { color: var(--ink); font-weight: 700; }
+
+.plans-hero { text-align: center; padding: 90px 25px 45px; background: radial-gradient(circle at 50% 20%,rgba(201,226,255,.7),transparent 44%); }
+.plans-hero h1, .account-title h1 { font-size: clamp(58px,7vw,92px); line-height: .92; letter-spacing: -.065em; font-weight: 410; margin: 23px 0; }
+.plans-hero h1 em, .account-title h1 em { font-family: Georgia,serif; color: #4f83ed; font-weight: 400; }
+.plans-hero > p { max-width: 670px; margin: 0 auto; color: #6f858a; font-size: 16px; line-height: 1.7; }
+.checkout-banner { width: min(1100px,calc(100% - 40px)); margin: 0 auto 20px; padding: 14px 17px; border-radius: 13px; display: flex; align-items: center; justify-content: center; gap: 9px; color: #6a6352; background: #f3eddd; border: 1px solid #e4dac1; font-size: 12px; }
+.membership-grid { max-width: 1280px; margin: 0 auto; padding: 25px 28px 90px; display: grid; grid-template-columns: repeat(4,1fr); gap: 15px; align-items: stretch; }
+.membership-card { position: relative; min-height: 480px; padding: 27px; border: 1px solid var(--line); border-radius: 25px; background: white; display: flex; flex-direction: column; box-shadow: 0 14px 38px rgba(35,54,54,.05); }
+.membership-card.popular { color: white; background: var(--ink); transform: translateY(-12px); box-shadow: 0 22px 48px rgba(23,53,61,.19); }
+.popular-tag { position: absolute; right: 18px; top: 18px; padding: 6px 9px; color: var(--ink); background: var(--gold); border-radius: 999px; font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
+.membership-card h2 { font-size: 25px; font-weight: 550; letter-spacing: -.04em; margin: 20px 0 7px; }
+.membership-card > p { color: #78898d; font-size: 12px; min-height: 34px; }
+.membership-card.popular > p { color: rgba(255,255,255,.55); }
+.plan-price { display: flex; align-items: baseline; gap: 5px; padding: 23px 0; margin-top: 8px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.membership-card.popular .plan-price { border-color: rgba(255,255,255,.13); }
+.plan-price > span { font-size: 11px; font-weight: 700; }
+.plan-price strong { font-size: 49px; font-weight: 470; letter-spacing: -.06em; }
+.plan-price small { color: #819095; }
+.membership-card ul { padding: 22px 0; margin: 0; list-style: none; display: grid; gap: 12px; }
+.membership-card li { display: flex; align-items: center; gap: 9px; font-size: 12px; }
+.membership-card li svg { color: #739d68; }
+.membership-card .button { margin-top: auto; }
+.membership-card.popular .button { background: var(--gold); color: var(--ink); box-shadow: none; }
+.stripe-trust { margin: -58px auto 85px; padding: 0 20px; display: flex; justify-content: center; align-items: center; gap: 8px; color: #77888c; font-size: 10px; text-align: center; }
+
+.account-page { background: linear-gradient(160deg,#f8f7f2,#edf4f3); }
+.account-title { max-width: 1180px; margin: 0 auto; padding: 80px 30px 45px; }
+.account-title h1 { font-size: clamp(52px,6vw,78px); }
+.account-title > p { color: #73868b; }
+.account-grid { max-width: 1180px; margin: 0 auto; padding: 0 30px 90px; display: grid; grid-template-columns: 1.15fr .85fr; gap: 16px; }
+.account-card { min-height: 270px; padding: 30px; border-radius: 24px; background: rgba(255,255,255,.86); border: 1px solid white; box-shadow: 0 16px 40px rgba(55,72,68,.06); display: flex; flex-direction: column; align-items: flex-start; }
+.account-card.plan-summary { background: var(--ink); color: white; }
+.account-icon { width: 49px; height: 49px; display: grid; place-items: center; color: var(--gold); background: rgba(200,170,100,.12); border-radius: 14px; margin-bottom: 27px; }
+.account-card > span { color: #7b8d91; font-size: 10px; font-weight: 750; text-transform: uppercase; letter-spacing: .12em; }
+.plan-summary > span, .plan-summary > p { color: rgba(255,255,255,.55); }
+.account-card h2 { text-transform: capitalize; font-size: 38px; font-weight: 470; letter-spacing: -.045em; margin: 11px 0 3px; }
+.account-card h3 { text-transform: capitalize; font-size: 25px; font-weight: 520; letter-spacing: -.035em; margin: 11px 0 5px; }
+.account-card > p { color: #718489; margin: 4px 0; font-size: 13px; }
+.plan-summary .button { margin-top: auto; background: white; color: var(--ink); box-shadow: none; }
+.text-button { margin-top: auto; border: 0; background: transparent; padding: 9px 0; display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 12px; cursor: pointer; }
+.account-loading { min-height: 70vh; display: grid; place-items: center; color: #72858a; }
+
+@media (max-width: 1080px) {
+  .membership-grid { grid-template-columns: repeat(2,1fr); }
+  .membership-card.popular { transform: none; }
+  .auth-page { grid-template-columns: .9fr 1.1fr; }
+}
+
+@media (max-width: 760px) {
+  .member-header { height: 74px; padding: 0 19px; }
+  .member-header .brand { font-size: 20px; }
+  .member-header .brand-mark { width: 36px; height: 36px; }
+  .member-header nav { gap: 14px; }
+  .member-header nav > a:first-child { display: none; }
+  .member-pill { padding: 9px 13px; }
+  .auth-page { display: block; background: var(--paper); }
+  .auth-story { min-height: 275px; padding: 25px 25px 45px; }
+  .auth-story-copy { margin-top: 54px; }
+  .auth-story-copy h1 { font-size: 52px; margin: 15px 0; }
+  .auth-story-copy > p, .auth-benefits { display: none; }
+  .auth-form-side { display: block; padding: 36px 24px 50px; }
+  .auth-mobile-logo { display: none; }
+  .signup-page { padding: 25px 18px 50px; }
+  .signup-card { grid-template-columns: 1fr; gap: 30px; padding: 28px 22px; }
+  .signup-intro h1 { font-size: 47px; }
+  .membership-grid, .account-grid { grid-template-columns: 1fr; }
+  .plans-hero { padding-top: 65px; }
+  .plans-hero h1 { font-size: 58px; }
+  .account-title { padding-top: 58px; }
+  .account-card { min-height: 250px; }
+}
+
+@media (max-width: 480px) {
+  .membership-grid { padding-left: 18px; padding-right: 18px; }
+  .auth-story { min-height: 245px; }
+  .auth-story-copy h1 { font-size: 46px; }
+  .auth-form-side { padding-top: 30px; }
+  .auth-links { gap: 15px; }
+}
+
 .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); }
 .reveal.is-visible { opacity: 1; transform: none; }
 

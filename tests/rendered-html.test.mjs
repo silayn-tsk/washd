@@ -2,13 +2,13 @@ import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 
-async function render() {
+async function render(path = "/") {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
   workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
   const { default: worker } = await import(workerUrl.href);
 
   return worker.fetch(
-    new Request("https://washd.test/", { headers: { accept: "text/html" } }),
+    new Request(`https://washd.test${path}`, { headers: { accept: "text/html" } }),
     { ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) } },
     { waitUntil() {}, passThroughOnException() {} },
   );
@@ -28,6 +28,23 @@ test("server-renders the complete Washd landing page", async () => {
   assert.match(html, /Washd for business/);
   assert.match(html, /https?:\/\/[^"']+\/og\.png/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape|react-loading-skeleton/i);
+});
+
+test("renders the Firebase login, sign-up, plans and protected account entry", async () => {
+  const pages = await Promise.all([
+    render("/login").then((response) => response.text()),
+    render("/signup").then((response) => response.text()),
+    render("/plans").then((response) => response.text()),
+    render("/account").then((response) => response.text()),
+  ]);
+
+  assert.match(pages[0], /Welcome back/);
+  assert.match(pages[0], /Use demo account/);
+  assert.match(pages[1], /Create account/);
+  assert.match(pages[1], /Secure Stripe-hosted payments/);
+  assert.match(pages[2], /Stripe’s secure checkout/);
+  assert.match(pages[2], /Professional/);
+  assert.match(pages[3], /Loading your account/);
 });
 
 test("keeps the product implementation free of starter preview code", async () => {

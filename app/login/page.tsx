@@ -1,0 +1,111 @@
+"use client";
+
+import { useState } from "react";
+import {
+  browserLocalPersistence,
+  sendPasswordResetEmail,
+  setPersistence,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { ArrowRight, Eye, EyeOff, LockKeyhole, MapPin, WashingMachine } from "lucide-react";
+import { auth } from "@/lib/firebase";
+
+function friendlyError(code?: string) {
+  if (code === "auth/invalid-credential" || code === "auth/wrong-password" || code === "auth/user-not-found") return "That email or password doesn’t match our records.";
+  if (code === "auth/too-many-requests") return "Too many attempts. Please wait a moment and try again.";
+  if (code === "auth/invalid-email") return "Enter a valid email address.";
+  return "We couldn’t log you in. Please try again.";
+}
+
+function safeNextPath() {
+  if (typeof window === "undefined") return "/account";
+  const next = new URLSearchParams(window.location.search).get("next");
+  return next?.startsWith("/") && !next.startsWith("//") ? next : "/account";
+}
+
+export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+
+  async function logIn(loginEmail = email, loginPassword = password) {
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      await setPersistence(auth, browserLocalPersistence);
+      await signInWithEmailAndPassword(auth, loginEmail.trim(), loginPassword);
+      window.location.assign(safeNextPath());
+    } catch (caught) {
+      setError(friendlyError((caught as { code?: string }).code));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function resetPassword() {
+    if (!email.trim()) {
+      setError("Enter your email first, then choose reset password.");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    try {
+      await sendPasswordResetEmail(auth, email.trim());
+      setNotice(`Password reset instructions were sent to ${email.trim()}.`);
+    } catch (caught) {
+      setError(friendlyError((caught as { code?: string }).code));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <main className="auth-page">
+      <section className="auth-story">
+        <a className="brand auth-brand" href="/">
+          <span className="brand-mark"><WashingMachine size={22} /></span><span>Washd</span>
+        </a>
+        <div className="auth-story-copy">
+          <span className="kicker light">Your laundry, in view</span>
+          <h1>From lobby<br />to <em>wardrobe.</em></h1>
+          <p>Book collections, follow each bag and manage your Washd plan from one beautifully simple account.</p>
+          <div className="auth-benefits">
+            <span><MapPin size={18} /> Live bag tracking</span>
+            <span><LockKeyhole size={18} /> Secure account access</span>
+          </div>
+        </div>
+        <div className="auth-orbit" aria-hidden="true"><span /><span /><span /></div>
+      </section>
+
+      <section className="auth-form-side">
+        <div className="auth-form-card">
+          <span className="auth-mobile-logo"><WashingMachine size={20} /></span>
+          <span className="kicker">Member access</span>
+          <h2>Welcome back.</h2>
+          <p>Schedule collections and track each bag from lobby to wardrobe.</p>
+
+          <form onSubmit={(event) => { event.preventDefault(); void logIn(); }}>
+            <label>Email<input required type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" /></label>
+            <label>Password
+              <span className="password-field">
+                <input required minLength={6} type={showPassword ? "text" : "password"} autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="At least 6 characters" />
+                <button type="button" aria-label={showPassword ? "Hide password" : "Show password"} onClick={() => setShowPassword((value) => !value)}>{showPassword ? <EyeOff size={19} /> : <Eye size={19} />}</button>
+              </span>
+            </label>
+            {error && <div className="form-alert error" role="alert">{error}</div>}
+            {notice && <div className="form-alert success" role="status">{notice}</div>}
+            <button className="button wide gold-button" type="submit" disabled={busy}>{busy ? "Logging in…" : <>Log in <ArrowRight size={18} /></>}</button>
+          </form>
+
+          <button className="demo-button" type="button" disabled={busy} onClick={() => void logIn("pravena@residence.my", "freshcycle123")}><MapPin size={16} /> Use demo account</button>
+          <div className="auth-links"><a href="/signup">Create an account</a><button type="button" onClick={() => void resetPassword()}>Reset password</button></div>
+          <small className="secure-note"><LockKeyhole size={13} /> Protected by Firebase Authentication</small>
+        </div>
+      </section>
+    </main>
+  );
+}

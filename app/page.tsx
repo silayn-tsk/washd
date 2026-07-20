@@ -130,9 +130,9 @@ export default function Home() {
         <nav className={menuOpen ? "nav-links open" : "nav-links"} aria-label="Main navigation">
           <a href="#services" onClick={() => setMenuOpen(false)}>Services</a>
           <a href="#how" onClick={() => setMenuOpen(false)}>How it works</a>
-          <a href="#pricing" onClick={() => setMenuOpen(false)}>Pricing</a>
+          <a href="/plans" onClick={() => setMenuOpen(false)}>Plans</a>
           <a href="#business" onClick={() => setMenuOpen(false)}>For business</a>
-          <button className="nav-login" type="button">Log in</button>
+          <a className="nav-login" href="/login">Log in</a>
           <button className="button button-small" type="button" onClick={openBooking}>
             Book a pickup
           </button>
@@ -378,8 +378,8 @@ export default function Home() {
       <footer className="footer">
         <div className="footer-top">
           <div><a className="brand footer-brand" href="#top"><span className="brand-mark"><WashingMachine size={22} /></span><span>Washd</span></a><p>From lobby to wardrobe.<br />Laundry care, made effortless.</p></div>
-          <div><strong>Explore</strong><a href="#services">Services</a><a href="#how">How it works</a><a href="#pricing">Pricing</a></div>
-          <div><strong>Company</strong><a href="#business">For business</a><a href="mailto:hello@washd.my">Contact</a><a href="#faq">Help centre</a></div>
+          <div><strong>Explore</strong><a href="#services">Services</a><a href="#how">How it works</a><a href="/plans">Membership plans</a></div>
+          <div><strong>Company</strong><a href="#business">For business</a><a href="mailto:hello@washd.my">Contact</a><a href="#faq">Help centre</a><a href="/login">Member login</a></div>
           <div><strong>Say hello</strong><a href="mailto:hello@washd.my">hello@washd.my</a><span>Daily, 8am–9pm</span><a href="#top">Instagram</a></div>
         </div>
         <div className="footer-bottom"><span>© 2026 Washd. Made fresh in Kuala Lumpur.</span><div><a href="#top">Privacy</a><a href="#top">Terms</a></div></div>
