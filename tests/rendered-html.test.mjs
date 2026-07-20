@@ -39,7 +39,7 @@ test("keeps the product implementation free of starter preview code", async () =
 
   assert.match(page, /IntersectionObserver/);
   assert.match(page, /prefers-reduced-motion|bookingOpen|estimate/);
-  assert.match(layout, /generateMetadata/);
+  assert.match(layout, /metadataBase: new URL\("https:\/\/washd-my-86c6d\.web\.app"\)/);
   assert.match(packageJson, /"name": "washd-laundry"/);
   assert.doesNotMatch(page + layout + packageJson, /SkeletonPreview|codex-preview|react-loading-skeleton/);
   await assert.rejects(access(new URL("../app/_sites-preview/SkeletonPreview.tsx", import.meta.url)));
