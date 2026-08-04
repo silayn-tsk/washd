@@ -33,6 +33,16 @@ const burdenIcons = [Clock3, Wind, Shirt];
 const routineIcons = [PackageCheck, WashingMachine, CalendarCheck];
 const safetyIcons = [PackageCheck, Camera, RotateCcw, ShieldCheck];
 const benefitIcons = [TimerReset, Sparkles, HeartHandshake, CalendarCheck];
+const emailPattern = /^[^\s@]+@[^\s@]+\.[A-Za-z]{2,63}$/;
+const malaysianMobilePattern = /^(?:60|0)1\d{8,9}$/;
+
+function isValidEmail(value: string) {
+  return value.length <= 254 && emailPattern.test(value.trim());
+}
+
+function isValidMalaysianMobile(value: string) {
+  return malaysianMobilePattern.test(value.replace(/\D/g, ""));
+}
 
 export default function Home() {
   const { content, plans, loading: contentLoading } = useSiteContent();
@@ -41,6 +51,8 @@ export default function Home() {
   const [enquiry, setEnquiry] = useState({ name: "", email: "", phone: "", residence: "", message: "" });
   const [enquiryBusy, setEnquiryBusy] = useState(false);
   const [enquiryStatus, setEnquiryStatus] = useState<"" | "success" | "error">("");
+  const [enquiryError, setEnquiryError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({ email: "", phone: "" });
   const [showBackToTop, setShowBackToTop] = useState(false);
 
   useEffect(() => {
@@ -71,12 +83,21 @@ export default function Home() {
 
   async function sendEnquiry(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const email = enquiry.email.trim().toLowerCase();
+    const phone = enquiry.phone.trim();
+    const nextErrors = {
+      email: isValidEmail(email) ? "" : "Enter a valid email address, for example name@example.com.",
+      phone: isValidMalaysianMobile(phone) ? "" : "Enter a valid Malaysian mobile number, for example 012-345 6789.",
+    };
+    setFieldErrors(nextErrors);
+    setEnquiryError("");
+    if (nextErrors.email || nextErrors.phone) return;
     setEnquiryBusy(true);
     setEnquiryStatus("");
     const { error } = await supabase.from("contact_requests").insert({
       name: enquiry.name.trim(),
-      email: enquiry.email.trim(),
-      phone: enquiry.phone.trim() || null,
+      email,
+      phone,
       organisation: enquiry.residence.trim(),
       interest: "residence",
       message: `Custom plan enquiry: ${enquiry.message.trim()}`,
@@ -84,10 +105,12 @@ export default function Home() {
     setEnquiryBusy(false);
     if (error) {
       setEnquiryStatus("error");
+      setEnquiryError(error.code === "23514" ? "Check that your email and Malaysian mobile number are valid, then try again." : "We couldn’t send the enquiry just now. Please message Washd on WhatsApp instead.");
       return;
     }
     setEnquiryStatus("success");
     setEnquiry({ name: "", email: "", phone: "", residence: "", message: "" });
+    setFieldErrors({ email: "", phone: "" });
   }
 
   return (
@@ -271,11 +294,11 @@ export default function Home() {
           <p className="final-standard-plan">Prefer a standard plan? <a href="/plans">Review all memberships <ArrowRight size={15} /></a></p>
         </div>
         <form className="enquiry-form reveal" onSubmit={sendEnquiry}>
-          <div><label>Full name<input required minLength={2} value={enquiry.name} onChange={(event) => setEnquiry({ ...enquiry, name: event.target.value })} placeholder="Your name" /></label><label>Email<input required type="email" value={enquiry.email} onChange={(event) => setEnquiry({ ...enquiry, email: event.target.value })} placeholder="you@example.com" /></label></div>
-          <div><label>Phone number<input value={enquiry.phone} onChange={(event) => setEnquiry({ ...enquiry, phone: event.target.value })} placeholder="e.g. 012-345 6789" /></label><label>Residence / organisation<input required minLength={2} value={enquiry.residence} onChange={(event) => setEnquiry({ ...enquiry, residence: event.target.value })} placeholder="Building or company" /></label></div>
+          <div><label>Full name<input required minLength={2} maxLength={100} value={enquiry.name} onChange={(event) => setEnquiry({ ...enquiry, name: event.target.value })} placeholder="Your name" /></label><label>Email<input required type="email" inputMode="email" autoComplete="email" maxLength={254} pattern="[^\s@]+@[^\s@]+\.[A-Za-z]{2,63}" aria-invalid={Boolean(fieldErrors.email)} value={enquiry.email} onChange={(event) => { setEnquiry({ ...enquiry, email: event.target.value }); setFieldErrors((current) => ({ ...current, email: "" })); }} onBlur={() => enquiry.email && setFieldErrors((current) => ({ ...current, email: isValidEmail(enquiry.email) ? "" : "Enter a valid email address, for example name@example.com." }))} placeholder="you@example.com" />{fieldErrors.email && <small className="enquiry-field-error">{fieldErrors.email}</small>}</label></div>
+          <div><label>Malaysian mobile number<input required type="tel" inputMode="tel" autoComplete="tel" maxLength={18} aria-invalid={Boolean(fieldErrors.phone)} value={enquiry.phone} onChange={(event) => { const phone = event.target.value.replace(/[^\d+\-()\s]/g, ""); setEnquiry({ ...enquiry, phone }); setFieldErrors((current) => ({ ...current, phone: "" })); }} onBlur={() => enquiry.phone && setFieldErrors((current) => ({ ...current, phone: isValidMalaysianMobile(enquiry.phone) ? "" : "Enter a valid Malaysian mobile number, for example 012-345 6789." }))} placeholder="e.g. 012-345 6789" />{fieldErrors.phone && <small className="enquiry-field-error">{fieldErrors.phone}</small>}</label><label>Residence / organisation<input required minLength={2} maxLength={160} value={enquiry.residence} onChange={(event) => setEnquiry({ ...enquiry, residence: event.target.value })} placeholder="Building or company" /></label></div>
           <label>What would your ideal plan include?<textarea required minLength={10} value={enquiry.message} onChange={(event) => setEnquiry({ ...enquiry, message: event.target.value })} placeholder="Tell us how many bags, pressed pieces and collections you need each month." /></label>
           {enquiryStatus === "success" && <div className="enquiry-notice success" role="status">{content.enquiry.success}</div>}
-          {enquiryStatus === "error" && <div className="enquiry-notice error" role="alert">We couldn’t send the enquiry just now. Please message Washd on WhatsApp instead.</div>}
+          {enquiryStatus === "error" && <div className="enquiry-notice error" role="alert">{enquiryError}</div>}
           <button className="deck-button gold" type="submit" disabled={enquiryBusy}>{enquiryBusy ? "Sending…" : content.enquiry.button} <ArrowRight size={18} /></button>
           <small className="enquiry-privacy">We use these details to answer your enquiry. See our <a href="/privacy">Privacy Notice</a>.</small>
         </form>
