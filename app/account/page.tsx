@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowRight, CalendarDays, Check, Clock3, CreditCard, LogOut, MapPin, PackageCheck, RefreshCw, Shirt, Sparkles, Truck, UserRound } from "lucide-react";
+import { ArrowRight, CalendarDays, Check, Clock3, Copy, CreditCard, LogOut, MapPin, PackageCheck, RefreshCw, Shirt, Sparkles, Truck, UserRound } from "lucide-react";
 import { useAuth } from "../auth-provider";
 import { MemberHeader } from "../member-header";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
@@ -63,6 +63,7 @@ export default function AccountPage() {
   const [billingBusy, setBillingBusy] = useState(false);
   const [error, setError] = useState("");
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
+  const [memberIdCopied, setMemberIdCopied] = useState(false);
 
   const loadDashboard = useCallback(async () => {
     if (!user) return;
@@ -117,6 +118,14 @@ export default function AccountPage() {
   const nextDue = collection?.due || nextDrop;
   const latestEvent = bag?.events?.at(-1);
   const lastUpdated = bag?.updated_at || latestEvent?.at;
+  const memberId = profile.member_id || "Assigning…";
+
+  async function copyMemberId() {
+    if (!profile.member_id) return;
+    await navigator.clipboard.writeText(profile.member_id);
+    setMemberIdCopied(true);
+    window.setTimeout(() => setMemberIdCopied(false), 1800);
+  }
 
   if (loading || !user) return <main className="member-page"><MemberHeader /><div className="account-loading">Loading your Washd dashboard…</div></main>;
 
@@ -124,8 +133,12 @@ export default function AccountPage() {
     <main className="member-page account-page dashboard-page">
       <MemberHeader />
       <section className="dashboard-title">
-        <div><span className="kicker">Member dashboard</span><h1>Hello, {profile.name?.split(" ")[0] || user.user_metadata?.name?.split(" ")[0] || "member"}.</h1><p>Your laundry journey, next collection and membership in one place.</p></div>
-        <div className="member-id-card"><span>Washd member ID</span><strong>{profile.member_id || "Assigning…"}</strong><small>Use this ID when contacting our team.</small></div>
+        <div className="dashboard-intro"><span className="kicker">Member dashboard</span><h1>Hello, {profile.name?.split(" ")[0] || user.user_metadata?.name?.split(" ")[0] || "member"}.</h1><p>Your laundry journey, next collection and membership in one place.</p></div>
+        <div className="member-id-card">
+          <div className="member-id-topline"><span>Washd member ID</span><i>Active member</i></div>
+          <strong>{memberId}</strong>
+          <div className="member-id-footer"><small>Keep this ID handy when contacting our care team.</small><button type="button" disabled={!profile.member_id} onClick={() => void copyMemberId()} aria-label="Copy member ID">{memberIdCopied ? <Check size={15} /> : <Copy size={15} />}{memberIdCopied ? "Copied" : "Copy"}</button></div>
+        </div>
       </section>
       {checkoutSuccess && <div className="checkout-banner success"><Check size={19} /> Payment complete. Your new membership will appear here as soon as confirmation arrives.</div>}
       {error && <div className="checkout-banner error" role="alert">{error}</div>}

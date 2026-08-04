@@ -152,31 +152,33 @@ export default function AdminPage() {
   return (
     <main className="admin-page">
       <header className="admin-header">
-        <div><Link className="admin-brand" href="/"><span>washd. admin</span></Link><span className="admin-secure"><LockKeyhole size={13} /> Owner only</span></div>
+        <div><Link className="admin-brand" href="/"><span className="admin-wordmark">washd<i>.</i></span><small>studio</small></Link><span className="admin-secure"><LockKeyhole size={13} /> Owner only</span></div>
         <div><a className="admin-preview" href="/" target="_blank">View website <ExternalLink size={15} /></a><button className="admin-save" type="button" disabled={saving} onClick={() => void saveEverything()}>{saving ? <><LoaderCircle className="spin" size={17} /> Saving…</> : <><Save size={17} /> Save all changes</>}</button></div>
       </header>
 
       <div className="admin-layout">
         <aside className="admin-sidebar">
-          <Link href="/"><ArrowLeft size={15} /> Back to site</Link>
+          <div className="admin-sidebar-intro"><span>Control room</span><strong>Website studio</strong><small>Content, commerce and operations.</small></div>
+          <Link className="admin-back" href="/"><ArrowLeft size={15} /> Back to site</Link>
           <strong>Website content</strong>
           {Object.keys(sectionLabels).map((key) => <button className={activeSection === key ? "active" : ""} type="button" key={key} onClick={() => setActiveSection(key)}>{sectionLabels[key]}</button>)}
           <strong>Commerce</strong>
           <button className={activeSection === "plans" ? "active" : ""} type="button" onClick={() => setActiveSection("plans")}>Membership plans</button>
           <button className={activeSection === "addons" ? "active" : ""} type="button" onClick={() => setActiveSection("addons")}>À-la-carte add-ons</button>
           <strong>Operations</strong>
-          <Link href="/admin/tracking">Member tracking</Link>
-          <Link href="/admin/enquiries">Enquiry inbox</Link>
-          <Link href="/admin/payments">Payment health</Link>
-          <Link href="/admin/security">Security & MFA</Link>
+          <Link className="admin-operation-link" href="/admin/tracking">Member tracking <span>↗</span></Link>
+          <Link className="admin-operation-link" href="/admin/enquiries">Enquiry inbox <span>↗</span></Link>
+          <Link className="admin-operation-link" href="/admin/payments">Payment health <span>↗</span></Link>
+          <Link className="admin-operation-link" href="/admin/security">Security & MFA <span>↗</span></Link>
           <button className="admin-logout" type="button" onClick={async () => { await supabase.auth.signOut(); window.location.assign("/"); }}><LogOut size={15} /> Log out</button>
         </aside>
 
         <section className="admin-editor">
-          <div className="admin-editor-title"><span>Editing</span><h1>{activeSection === "plans" ? "Membership plans" : activeSection === "addons" ? "À-la-carte add-ons" : sectionLabels[activeSection]}</h1><p>Changes go live after you choose “Save all changes”.</p></div>
+          <div className="admin-editor-heading"><div className="admin-editor-title"><span>Editing</span><h1>{activeSection === "plans" ? "Membership plans" : activeSection === "addons" ? "À-la-carte add-ons" : sectionLabels[activeSection]}</h1><p>Shape the public Washd experience, then review and publish when ready.</p></div><div className="admin-workspace-status"><span>Publishing mode</span><strong><i /> Review, then save</strong></div></div>
           {notice && <div className="admin-notice success"><CheckCircle2 size={18} /> {notice}</div>}
           {error && <div className="admin-notice error"><ShieldAlert size={18} /> {error}</div>}
 
+          <div className="admin-panel-transition" key={activeSection}>
           {activeSection === "plans" ? (
             <div className="admin-plan-list">
               {plans.map((plan, index) => (
@@ -207,6 +209,7 @@ export default function AdminPage() {
               <ContentFields value={content[activeSection as keyof SiteContent] as EditableValue} path={[activeSection]} onChange={updateContent} />
             </div>
           )}
+          </div>
         </section>
       </div>
     </main>
