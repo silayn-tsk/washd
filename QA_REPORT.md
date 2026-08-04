@@ -19,9 +19,8 @@ The current Firebase release is visually stable on desktop and mobile Chrome, ha
 - Authenticated member dashboard and tracking presentation.
 - Owner-only payments and enquiries admin screens.
 - Owner-only Stripe environment readiness audit; unauthenticated invocation is rejected by the hosted function gateway.
-- Fifteen public/member/admin/metadata routes return HTTP 200.
-- The expanded release now exposes seventeen verified routes, including `/mfa` and `/admin/security`.
-- Thirty-five internal link references resolve to valid exported routes.
+- Twenty-one public/member/admin/metadata routes return HTTP 200, including bilingual service information, terms and care-guarantee routes.
+- One hundred and seventy internal link references across fourteen paths resolve with no failures.
 - Browser console showed no errors during the checked journeys.
 
 ## Automated baseline
@@ -62,6 +61,8 @@ Build verification:
 - Added enforceable owner MFA, CSP/HSTS headers and configurable production-domain metadata.
 - Added direct test/live Stripe mode, payout, price, webhook and portal verification to payment operations.
 - Added safe recovery from stale cross-mode Stripe customer references during checkout.
+- Added bilingual electronic-trade disclosures, terms and care-guarantee pages with correct `lang` and alternate-language metadata.
+- Required terms acceptance before payment and added a live-mode supplier-identity safety gate.
 
 ## Still required before go-live approval
 
@@ -73,6 +74,7 @@ Build verification:
 - Test admin content save, plan sync, enquiry status changes and tracking updates end to end.
 - Run keyboard-only coverage and physical iPhone/Safari, Android/Chrome and desktop Edge checks.
 - Add the approved legal business name, registration number and registered address.
+- Obtain owner/professional approval of the implemented bilingual legal drafts and confirm tax/certification statements.
 - Connect and test the production domain.
 - Confirm the production backup and recovery procedure.
 

@@ -44,7 +44,11 @@ test("renders Supabase member pages and the protected admin editor", async () =>
     render("/privacy").then((response) => response.text()),
     render("/privacy/bm").then((response) => response.text()),
     render("/terms").then((response) => response.text()),
+    render("/terms/bm").then((response) => response.text()),
+    render("/service-information").then((response) => response.text()),
+    render("/maklumat-perkhidmatan").then((response) => response.text()),
     render("/care-guarantee").then((response) => response.text()),
+    render("/care-guarantee/bm").then((response) => response.text()),
     render("/admin/payments").then((response) => response.text()),
     render("/mfa").then((response) => response.text()),
     render("/admin/security").then((response) => response.text()),
@@ -63,10 +67,14 @@ test("renders Supabase member pages and the protected admin editor", async () =>
   assert.match(pages[6], /Privacy Notice/);
   assert.match(pages[7], /Notis Privasi/);
   assert.match(pages[8], /Service Terms/);
-  assert.match(pages[9], /Washd Care Guarantee/);
-  assert.match(pages[10], /Checking payment health/);
-  assert.match(pages[11], /Checking account security/);
-  assert.match(pages[12], /Opening admin security/);
+  assert.match(pages[9], /Terma Perkhidmatan/);
+  assert.match(pages[10], /Service Information/);
+  assert.match(pages[11], /Maklumat Perkhidmatan/);
+  assert.match(pages[12], /Washd Care Guarantee/);
+  assert.match(pages[13], /Jaminan Penjagaan Washd/);
+  assert.match(pages[14], /Checking payment health/);
+  assert.match(pages[15], /Checking account security/);
+  assert.match(pages[16], /Opening admin security/);
 });
 
 test("keeps the product implementation free of starter preview code", async () => {

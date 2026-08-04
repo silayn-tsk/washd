@@ -45,6 +45,9 @@ Owner decisions and secure setup handoffs are condensed in `OWNER_LAUNCH_ACTIONS
 
 - [ ] Approve and publish Privacy Notice / Notis Privasi in English and Bahasa Malaysia.
 - [ ] Approve and publish Terms of Service, cancellation/refund rules and garment-care policy.
+- [x] Publish owner-review drafts of the privacy notice, service terms, care guarantee and consolidated service information in English and Bahasa Malaysia.
+- [x] Add full-price, payment-method, estimated-supply, correction, acknowledgement and complaint disclosures required for electronic trade.
+- [x] Require terms acceptance before checkout, record the version/time in Stripe metadata and block live checkout while registered supplier details are incomplete.
 - [ ] Add the registered business name, registration number, address and support contact.
 - [ ] Connect the custom domain and verify HTTPS.
 - [x] Make canonical metadata, sitemap and robots host configurable through `NEXT_PUBLIC_SITE_URL` for the custom-domain build.
@@ -96,16 +99,17 @@ Owner decisions and secure setup handoffs are condensed in `OWNER_LAUNCH_ACTIONS
 8. Cloudflare Turnstile keys have not been created or enabled in Supabase yet; the frontend integration is staged but intentionally dormant.
 9. The launch source is committed locally, but the legacy source remote is inaccessible; create an owner-controlled off-device copy before launch.
 10. Production still contains one demo member, two test enquiries, admin test checkout data and the Stripe test event ledger; owner approval is required before destructive cleanup.
+11. The bilingual legal pages are implemented but still require the registered supplier details, tax/certification confirmations and owner/professional approval recorded in `LEGAL_READINESS_AUDIT.md`.
 
 ## Latest QA baseline — 4 August 2026
 
-- Live Firebase routes checked: 15/15 returned HTTP 200.
-- Exported-site internal links checked: 35 references across 9 internal paths, with no broken targets.
+- Live Firebase routes checked: 21/21 returned HTTP 200.
+- Exported-site internal links checked: 170 references across 14 internal paths, with no broken targets.
 - Mobile Lighthouse: Performance 100, Accessibility 100, Best Practices 100 and SEO 100 on the latest run.
 - Mobile Core Web Vitals lab baseline: LCP 1.1 s, FCP 1.1 s, TBT 70 ms and CLS 0.
 - `eslint`, TypeScript, application build and all three rendered-HTML tests pass.
 - Full evidence and remaining test coverage are recorded in `QA_REPORT.md`.
-- `npm run launch:check` now provides a repeatable public-release gate; the current release passes 28/28 checks.
+- `npm run launch:check` now provides a repeatable public-release gate; the current release passes 32/32 checks.
 - Operating, incident, refund, tracking and recovery procedures are recorded in `OPERATIONS_RUNBOOK.md`.
 - Admin MFA is deployed but intentionally not enforced until the owner scans the QR code and verifies the first six-digit code.
 - Hosted Auth now permits redirects only to the production Firebase origin; localhost recovery redirects were removed.

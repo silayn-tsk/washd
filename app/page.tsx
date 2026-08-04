@@ -273,6 +273,7 @@ export default function Home() {
           {enquiryStatus === "success" && <div className="enquiry-notice success" role="status">{content.enquiry.success}</div>}
           {enquiryStatus === "error" && <div className="enquiry-notice error" role="alert">We couldn’t send the enquiry just now. Please message Washd on WhatsApp instead.</div>}
           <button className="deck-button gold" type="submit" disabled={enquiryBusy}>{enquiryBusy ? "Sending…" : content.enquiry.button} <ArrowRight size={18} /></button>
+          <small className="enquiry-privacy">We use these details to answer your enquiry. See our <a href="/privacy">Privacy Notice</a> or <a href="/privacy/bm">Notis Privasi</a>.</small>
         </form>
       </section>
 
@@ -280,7 +281,7 @@ export default function Home() {
         <div><a className="deck-brand footer" href="#top"><span className="deck-brand-mark"><WashingMachine size={21} /></span><span className="deck-wordmark">washd<i>.</i></span></a><p>{content.brand.tagline}<br />While you live your life.</p></div>
         <div><strong>Explore</strong><a href="#how">How it works</a><a href="#services">Services</a><a href="/plans">Membership plans</a></div>
         <div><strong>Contact</strong><a href={joinUrl} target="_blank" rel="noreferrer">{content.contact.phoneDisplay}</a><a href={`mailto:${content.contact.email}`}>{content.contact.email}</a><span>{content.contact.serviceArea}</span></div>
-        <div><strong>Members & policies</strong><a href="/login">Log in</a><a href="/account">My account</a><a href="/privacy">Privacy notice</a><a href="/terms">Service terms</a><a href="/care-guarantee">Care guarantee</a></div>
+        <div><strong>Members & policies</strong><a href="/login">Log in</a><a href="/account">My account</a><a href="/privacy">Privacy notice</a><a href="/terms">Service terms</a><a href="/service-information">Service information</a><a href="/maklumat-perkhidmatan">Maklumat perkhidmatan</a><a href="/care-guarantee">Care guarantee</a></div>
         <small>© 2026 Washd. {content.brand.tagline}{content.contact.legalName && <> · {content.contact.legalName}{content.contact.registrationNumber && ` (${content.contact.registrationNumber})`}</>}</small>
       </footer>
     </main>

@@ -15,6 +15,7 @@ export default function PlansPage() {
   const [selectedPlanId, setSelectedPlanId] = useState("");
   const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
   const [checkoutBusy, setCheckoutBusy] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [error, setError] = useState("");
   const [status, setStatus] = useState<"success" | "cancelled" | "">("");
 
@@ -44,6 +45,7 @@ export default function PlansPage() {
     }
     setSelectedPlanId(plan.id);
     setSelectedAddons([]);
+    setTermsAccepted(false);
     setError("");
     window.history.pushState({}, "", `/plans?plan=${encodeURIComponent(plan.id)}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -59,12 +61,14 @@ export default function PlansPage() {
     setCheckoutBusy(true);
     setError("");
     try {
+      if (!termsAccepted) throw new Error("TERMS_REQUIRED");
       if (!isSupabaseConfigured) throw new Error("Payment service is not configured");
       const origin = window.location.origin;
       const { data, error: checkoutError } = await supabase.functions.invoke<{ url: string }>("create-checkout-session", {
         body: {
           planId: selectedPlan.id,
           addonIds: selectedAddons,
+          termsAccepted: true,
           successUrl: `${origin}/account?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: `${origin}/plans?plan=${encodeURIComponent(selectedPlan.id)}&checkout=cancelled`,
         },
@@ -72,8 +76,8 @@ export default function PlansPage() {
       if (checkoutError) throw checkoutError;
       if (!data?.url?.startsWith("https://")) throw new Error("Missing secure checkout URL");
       window.location.assign(data.url);
-    } catch {
-      setError("We couldn’t open secure payment. Please try again or contact Washd for help.");
+    } catch (caught) {
+      setError(caught instanceof Error && caught.message === "TERMS_REQUIRED" ? "Review and accept the service terms before continuing to payment." : "We couldn’t open secure payment. Please try again or contact Washd for help.");
       setCheckoutBusy(false);
     }
   }
@@ -121,7 +125,7 @@ export default function PlansPage() {
     <main className="member-page plan-detail-page">
       <MemberHeader />
       <section className="plan-detail-hero">
-        <button className="plan-back" type="button" onClick={() => { setSelectedPlanId(""); setSelectedAddons([]); window.history.pushState({}, "", "/plans"); }}><ArrowLeft size={16} /> All plans</button>
+        <button className="plan-back" type="button" onClick={() => { setSelectedPlanId(""); setSelectedAddons([]); setTermsAccepted(false); window.history.pushState({}, "", "/plans"); }}><ArrowLeft size={16} /> All plans</button>
         <div className="plan-detail-grid">
           <div>
             <span className="kicker">Your selected membership</span>
@@ -175,7 +179,7 @@ export default function PlansPage() {
           <div className="review-total"><span>Monthly total</span><strong>RM {total}</strong></div>
           <small>Renews monthly. Cancel with two weeks’ notice. Add-ons renew with your selected plan.</small>
         </div>
-        <div className="payment-action"><LockKeyhole size={24} /><h3>Ready to subscribe?</h3><p>You’ll continue to Stripe to enter your card details securely.</p><button className="button wide gold-button" type="button" disabled={checkoutBusy} onClick={() => void makePayment()}>{checkoutBusy ? "Opening secure payment…" : "Make payment"} <ArrowRight size={18} /></button><small>Washd never stores your complete card number.</small></div>
+        <div className="payment-action"><LockKeyhole size={24} /><h3>Ready to subscribe?</h3><p>You’ll continue to Stripe to enter your card details securely.</p><label className="terms-acceptance"><input type="checkbox" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} /><span>I have reviewed and agree to the <Link href="/terms" target="_blank">Service Terms</Link> and <Link href="/service-information" target="_blank">Service Information</Link>. <Link href="/maklumat-perkhidmatan" target="_blank">Bahasa Malaysia</Link></span></label><button className="button wide gold-button" type="button" disabled={checkoutBusy || !termsAccepted} onClick={() => void makePayment()}>{checkoutBusy ? "Opening secure payment…" : "Make payment"} <ArrowRight size={18} /></button><small>Washd never stores your complete card number.</small></div>
       </section>
     </main>
   );

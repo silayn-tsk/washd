@@ -10,7 +10,8 @@ const attempts = Number(process.env.WASHD_CHECK_ATTEMPTS || 2);
 
 const routes = [
   "/", "/login", "/signup", "/plans", "/account", "/privacy", "/privacy/bm",
-  "/terms", "/care-guarantee", "/admin", "/admin/enquiries", "/admin/payments",
+  "/terms", "/terms/bm", "/service-information", "/maklumat-perkhidmatan",
+  "/care-guarantee", "/care-guarantee/bm", "/admin", "/admin/enquiries", "/admin/payments",
   "/admin/security", "/admin/tracking", "/mfa", "/robots.txt", "/sitemap.xml",
 ];
 
@@ -91,7 +92,7 @@ try {
   const robots = await (await request("/robots.txt")).text();
   const sitemap = await (await request("/sitemap.xml")).text();
   const robotsOk = robots.includes("Disallow: /admin") && robots.includes("Disallow: /mfa") && robots.includes("Sitemap:");
-  const sitemapOk = sitemap.includes("<urlset") && sitemap.includes("/plans");
+  const sitemapOk = sitemap.includes("<urlset") && sitemap.includes("/plans") && sitemap.includes("/maklumat-perkhidmatan") && sitemap.includes("/terms/bm");
   results.push({ check: "robots.txt launch rules", ok: robotsOk, detail: robotsOk ? "present" : "incomplete" });
   results.push({ check: "sitemap.xml", ok: sitemapOk, detail: sitemapOk ? "valid baseline" : "incomplete" });
   failed ||= !robotsOk || !sitemapOk;

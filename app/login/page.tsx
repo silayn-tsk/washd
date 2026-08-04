@@ -130,7 +130,7 @@ export default function LoginPage() {
           </form>
 
           <div className="auth-links"><a href="/signup">Create an account</a><button type="button" onClick={() => void resetPassword()}>Reset password</button></div>
-          <small className="secure-note"><LockKeyhole size={13} /> Secure encrypted member access</small>
+          <small className="secure-note"><LockKeyhole size={13} /> Secure encrypted member access · <Link href="/privacy">Privacy</Link> · <Link href="/privacy/bm">Notis Privasi</Link></small>
         </div>
       </section>
     </main>

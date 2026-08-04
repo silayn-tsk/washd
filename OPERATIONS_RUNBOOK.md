@@ -57,6 +57,7 @@ Never accept an unlabelled bag.
 ## 5. Payments, cancellations and refunds
 
 - Stripe is the source of truth for charges, subscriptions, refunds and disputes; Supabase mirrors service status for the member experience.
+- Retain the order, acknowledgement, Stripe charge/subscription/refund records, selected plan/add-ons and recorded terms version/acceptance for at least three years where required by Malaysian electronic-trade law. Preserve longer where another lawful accounting, tax, dispute or regulatory requirement applies.
 - Do not ask a customer to send card details by email, WhatsApp or the enquiry form.
 - For a failed payment, ask the customer to update their payment method through **Manage billing**. Pause service if payment remains unresolved.
 - For cancellation, confirm the effective end date and two-week notice rule. Do not promise an immediate refund unless the case qualifies under the published terms.
@@ -125,3 +126,4 @@ This local snapshot supplements rather than replaces Supabase managed backups. C
 No launch announcement should be sent until the real-payment test, production-email test, recovery snapshot and critical customer journey have passed.
 
 Production email setup and its safe confirmation-enforcement sequence are documented in `PRODUCTION_EMAIL_SETUP.md`.
+The implemented disclosure mapping and remaining owner approvals are documented in `LEGAL_READINESS_AUDIT.md`.

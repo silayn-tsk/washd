@@ -68,6 +68,7 @@ export default function SignupPage() {
           <TurnstileWidget action="signup" onToken={handleCaptcha} resetSignal={captchaReset} />
           {error && <div className="form-alert error" role="alert">{error}</div>}
           <button className="button wide gold-button" type="submit" disabled={busy}>{busy ? "Creating account…" : <>Create account <ArrowRight size={18} /></>}</button>
+          <p className="form-foot">We use these details to create and secure your account. Read our <Link href="/privacy">Privacy Notice</Link> or <Link href="/privacy/bm">Notis Privasi</Link>.</p>
           <p className="form-foot">Already a member? <a href="/login">Log in</a></p>
         </form>
       </section>

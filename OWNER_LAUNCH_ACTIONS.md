@@ -46,6 +46,7 @@ Do not purchase a domain based only on a chat suggestion; confirm availability, 
 - Finish Stripe business and bank-account verification.
 - Confirm the bank account that should receive MYR payouts.
 - Create live products/prices, customer portal and signed webhook using the guarded setup script.
+- Set the live Stripe public Terms of Service URL to the final Washd `/terms` page, then enable Stripe's own required checkbox with the `STRIPE_REQUIRE_TERMS_CONSENT=true` Edge Function secret.
 - Store live secrets only in Stripe/Supabase secret storage and the owner password manager.
 - Complete one real low-value subscription, verify the database/dashboard update, cancel/refund it and confirm the payout/refund records.
 

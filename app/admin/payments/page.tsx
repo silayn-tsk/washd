@@ -33,7 +33,7 @@ type PaymentReadiness = {
   mode: "test" | "live" | "unknown";
   readyForLive: boolean;
   account: { detailsSubmitted: boolean; chargesEnabled: boolean; payoutsEnabled: boolean; country: string | null; defaultCurrency: string | null };
-  checks: { pricesReady: boolean; configuredPrices: number; webhookReady: boolean; portalReady: boolean };
+  checks: { pricesReady: boolean; configuredPrices: number; webhookReady: boolean; portalReady: boolean; legalDisclosureReady: boolean };
   issues: string[];
   checkedAt: string;
 };
@@ -114,6 +114,7 @@ export default function AdminPaymentsPage() {
             <li className={readiness.checks.pricesReady ? "pass" : "fail"}>{readiness.checks.configuredPrices} MYR prices {readiness.checks.pricesReady ? "verified" : "need attention"}</li>
             <li className={readiness.checks.webhookReady ? "pass" : "fail"}>Webhook {readiness.checks.webhookReady ? "verified" : "not ready"}</li>
             <li className={readiness.checks.portalReady ? "pass" : "fail"}>Customer portal {readiness.checks.portalReady ? "verified" : "not ready"}</li>
+            <li className={readiness.checks.legalDisclosureReady ? "pass" : "fail"}>Supplier disclosure {readiness.checks.legalDisclosureReady ? "complete" : "incomplete"}</li>
           </ul>
           {!readiness.readyForLive && readiness.issues.length > 0 && <details><summary>Why launch is blocked</summary><ul>{readiness.issues.map((issue) => <li key={issue}>{issue}</li>)}</ul></details>}
           <small>Checked {new Date(readiness.checkedAt).toLocaleString("en-MY")} · No payment keys or account identifiers are shown.</small>

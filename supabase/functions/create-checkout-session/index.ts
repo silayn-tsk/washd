@@ -13,8 +13,17 @@ Deno.serve(async (request) => {
     const user = await requireUser(request);
     const body = await request.json();
     const planId = String(body?.planId || "");
+    if (body?.termsAccepted !== true) return json(request, { error: "Service terms must be accepted" }, 400);
     const addonIds = Array.isArray(body?.addonIds) ? [...new Set(body.addonIds.map((value: unknown) => String(value)))].slice(0, 8) : [];
     const supabase = adminClient();
+    const liveMode = (Deno.env.get("STRIPE_SECRET_KEY") || "").startsWith("sk_live_");
+    if (liveMode) {
+      const { data: siteContent, error: siteContentError } = await supabase.from("site_content").select("content").eq("key", "main").maybeSingle();
+      const contact = siteContent?.content?.contact as Record<string, unknown> | undefined;
+      const legalDisclosureReady = !siteContentError && [contact?.legalName, contact?.registrationNumber, contact?.registeredAddress]
+        .every((value) => typeof value === "string" && value.trim().length > 0);
+      if (!legalDisclosureReady) return json(request, { error: "Live checkout is not yet available" }, 503);
+    }
     const { data: plan, error: planError } = await supabase
       .from("plans")
       .select("id, name, stripe_price_id")
@@ -71,6 +80,8 @@ Deno.serve(async (request) => {
 
     const checkoutMinute = Math.floor(Date.now() / 60000);
     const selectionKey = [planId, ...addonIds.sort()].join("-").replace(/[^a-z0-9-]/gi, "").slice(0, 120);
+    const termsAcceptedAt = new Date().toISOString();
+    const checkoutMetadata = { supabaseUserId: user.id, planId, addonIds: addonIds.join(","), termsVersion: "2026-08-04", termsAcceptedAt };
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: customerId,
@@ -80,8 +91,9 @@ Deno.serve(async (request) => {
       cancel_url: safeReturnUrl(body?.cancelUrl, "/plans?checkout=cancelled"),
       allow_promotion_codes: true,
       payment_method_collection: "always",
-      subscription_data: { metadata: { supabaseUserId: user.id, planId, addonIds: addonIds.join(",") } },
-      metadata: { supabaseUserId: user.id, planId, addonIds: addonIds.join(",") },
+      ...(Deno.env.get("STRIPE_REQUIRE_TERMS_CONSENT") === "true" ? { consent_collection: { terms_of_service: "required" as const } } : {}),
+      subscription_data: { metadata: checkoutMetadata },
+      metadata: checkoutMetadata,
     }, { idempotencyKey: `washd-checkout-${user.id}-${selectionKey}-${checkoutMinute}` });
 
     const { error: pendingUpdateError } = await supabase.from("profiles").update({

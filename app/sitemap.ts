@@ -13,6 +13,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${siteUrl}/privacy`, lastModified, changeFrequency: "yearly", priority: 0.3 },
     { url: `${siteUrl}/privacy/bm`, lastModified, changeFrequency: "yearly", priority: 0.3 },
     { url: `${siteUrl}/terms`, lastModified, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${siteUrl}/terms/bm`, lastModified, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${siteUrl}/service-information`, lastModified, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${siteUrl}/maklumat-perkhidmatan`, lastModified, changeFrequency: "yearly", priority: 0.4 },
     { url: `${siteUrl}/care-guarantee`, lastModified, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${siteUrl}/care-guarantee/bm`, lastModified, changeFrequency: "yearly", priority: 0.3 },
   ];
 }

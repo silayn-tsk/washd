@@ -29,16 +29,21 @@ Deno.serve(async (request) => {
     const stripe = stripeClient();
     const supabase = adminClient();
 
-    const [account, plansResult, addonsResult, endpoints, portalConfigurations] = await Promise.all([
+    const [account, plansResult, addonsResult, siteContentResult, endpoints, portalConfigurations] = await Promise.all([
       stripe.accounts.retrieve(),
       supabase.from("plans").select("id, name, stripe_price_id").eq("active", true).order("sort_order"),
       supabase.from("plan_addons").select("id, name, stripe_price_id").eq("active", true).order("sort_order"),
+      supabase.from("site_content").select("content").eq("key", "main").maybeSingle(),
       stripe.webhookEndpoints.list({ limit: 100 }),
       stripe.billingPortal.configurations.list({ active: true, limit: 100 }),
     ]);
 
     if (plansResult.error) throw plansResult.error;
     if (addonsResult.error) throw addonsResult.error;
+
+    const contact = siteContentResult.data?.content?.contact as Record<string, unknown> | undefined;
+    const legalDisclosureReady = !siteContentResult.error && [contact?.legalName, contact?.registrationNumber, contact?.registeredAddress]
+      .every((value) => typeof value === "string" && value.trim().length > 0);
 
     const priceRows = [
       ...((plansResult.data || []) as PriceRow[]).map((row) => ({ ...row, kind: "plan" })),
@@ -86,9 +91,10 @@ Deno.serve(async (request) => {
     if (!account.payouts_enabled) issues.push("Stripe payouts are not enabled");
     if (!webhookReady) issues.push("The signed Washd webhook is missing or incomplete");
     if (!portalReady) issues.push("The configured customer portal is missing or incomplete");
+    if (!legalDisclosureReady) issues.push("Registered supplier name, SSM number or business address is missing");
 
     const pricesReady = priceRows.length > 0 && priceIssues.length === 0;
-    const readyForLive = mode === "live" && accountReady && pricesReady && webhookReady && portalReady;
+    const readyForLive = mode === "live" && accountReady && pricesReady && webhookReady && portalReady && legalDisclosureReady;
 
     return json(request, {
       mode,
@@ -105,6 +111,7 @@ Deno.serve(async (request) => {
         configuredPrices: priceRows.length,
         webhookReady,
         portalReady,
+        legalDisclosureReady,
       },
       issues,
       checkedAt: new Date().toISOString(),
