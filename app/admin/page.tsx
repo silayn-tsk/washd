@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeft, CheckCircle2, ExternalLink, LoaderCircle, LockKeyhole, LogOut, Save, ShieldAlert } from "lucide-react";
+import { ArrowLeft, BookOpenText, CheckCircle2, ExternalLink, LoaderCircle, LockKeyhole, LogOut, Save, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "../auth-provider";
 import { defaultAddons, defaultPlans, defaultSiteContent, mergeSiteContent, type Plan, type PlanAddon, type SiteContent } from "@/lib/site-content";
@@ -29,6 +29,13 @@ const sectionLabels: Record<string, string> = {
   finalCta: "Final call to action",
   contact: "Contact details",
 };
+
+const policyLabels = {
+  privacy: "Privacy notice",
+  terms: "Service terms",
+  serviceInformation: "Service information",
+  careGuarantee: "Care guarantee",
+} as const;
 
 const ownerEmail = "washdmy@gmail.com";
 
@@ -62,7 +69,7 @@ function ContentFields({ value, path, onChange }: { value: EditableValue; path: 
   }
   const text = String(value ?? "");
   const multiline = text.length > 64 || ["body", "intro", "footer"].includes(key);
-  return <label className={multiline ? "admin-field full" : "admin-field"}><span>{label}</span>{multiline ? <textarea value={text} onChange={(event) => onChange(path, event.target.value)} /> : <input value={text} onChange={(event) => onChange(path, event.target.value)} />}</label>;
+  return <label className={multiline ? "admin-field full" : "admin-field"} data-field={key}><span>{label}</span>{multiline ? <textarea value={text} onChange={(event) => onChange(path, event.target.value)} /> : <input value={text} onChange={(event) => onChange(path, event.target.value)} />}</label>;
 }
 
 export default function AdminPage() {
@@ -75,6 +82,12 @@ export default function AdminPage() {
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
+  const activePolicyKey = activeSection.startsWith("policy-") ? activeSection.slice(7) as keyof SiteContent["policies"] : null;
+  const activeTitle = activePolicyKey
+    ? policyLabels[activePolicyKey]
+    : activeSection === "plans" ? "Membership plans"
+      : activeSection === "addons" ? "À-la-carte add-ons"
+        : sectionLabels[activeSection];
 
   useEffect(() => {
     if (!authLoading && !user) window.location.replace("/login?next=/admin");
@@ -162,6 +175,8 @@ export default function AdminPage() {
           <Link className="admin-back" href="/"><ArrowLeft size={15} /> Back to site</Link>
           <strong>Website content</strong>
           {Object.keys(sectionLabels).map((key) => <button className={activeSection === key ? "active" : ""} type="button" key={key} onClick={() => setActiveSection(key)}>{sectionLabels[key]}</button>)}
+          <strong>Policies</strong>
+          {(Object.keys(policyLabels) as Array<keyof typeof policyLabels>).map((key) => <button className={activeSection === `policy-${key}` ? "active" : ""} type="button" key={key} onClick={() => setActiveSection(`policy-${key}`)}><BookOpenText size={14} /> {policyLabels[key]}</button>)}
           <strong>Commerce</strong>
           <button className={activeSection === "plans" ? "active" : ""} type="button" onClick={() => setActiveSection("plans")}>Membership plans</button>
           <button className={activeSection === "addons" ? "active" : ""} type="button" onClick={() => setActiveSection("addons")}>À-la-carte add-ons</button>
@@ -174,12 +189,17 @@ export default function AdminPage() {
         </aside>
 
         <section className="admin-editor">
-          <div className="admin-editor-heading"><div className="admin-editor-title"><span>Editing</span><h1>{activeSection === "plans" ? "Membership plans" : activeSection === "addons" ? "À-la-carte add-ons" : sectionLabels[activeSection]}</h1><p>Shape the public Washd experience, then review and publish when ready.</p></div><div className="admin-workspace-status"><span>Publishing mode</span><strong><i /> Review, then save</strong></div></div>
+          <div className="admin-editor-heading"><div className="admin-editor-title"><span>Editing</span><h1>{activeTitle}</h1><p>{activePolicyKey ? "Edit the English policy heading, update date and optional replacement body." : "Shape the public Washd experience, then review and publish when ready."}</p></div><div className="admin-workspace-status"><span>Publishing mode</span><strong><i /> Review, then save</strong></div></div>
           {notice && <div className="admin-notice success"><CheckCircle2 size={18} /> {notice}</div>}
           {error && <div className="admin-notice error"><ShieldAlert size={18} /> {error}</div>}
 
           <div className="admin-panel-transition" key={activeSection}>
-          {activeSection === "plans" ? (
+          {activePolicyKey ? (
+            <div className="admin-section-card admin-policy-card">
+              <div className="admin-policy-guidance"><BookOpenText size={19} /><div><strong>English master policy</strong><p>Leave “Body” empty to keep the current policy wording. To replace it, start every section with <code>## Section heading</code>, followed by its text. Translated pages keep their existing reviewed copy.</p></div></div>
+              <ContentFields value={content.policies[activePolicyKey] as unknown as EditableValue} path={["policies", activePolicyKey]} onChange={updateContent} />
+            </div>
+          ) : activeSection === "plans" ? (
             <div className="admin-plan-list">
               {plans.map((plan, index) => (
                 <article className="admin-plan-card" key={plan.id}>

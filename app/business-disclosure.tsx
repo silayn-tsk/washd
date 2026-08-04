@@ -12,7 +12,7 @@ export function BusinessDisclosure({ locale = "en" }: { locale?: "en" | "ms" | "
   return (
     <aside className="business-disclosure" aria-label={label}>
       <strong>{label}</strong>
-      <span>{contact.legalName || contact.name || "Washd"}{contact.registrationNumber && ` · ${contact.registrationNumber}`}</span>
+      <span>{contact.legalName || "Washd"}{contact.registrationNumber && ` · ${contact.registrationNumber}`}</span>
       {contact.registeredAddress && <span>{contact.registeredAddress}</span>}
       <span>{contact.email} · {contact.phoneDisplay}</span>
       <span>{serviceArea}</span>

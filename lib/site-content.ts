@@ -3,6 +3,14 @@ export type ContentCard = {
   body: string;
 };
 
+export type PolicyPageContent = {
+  eyebrow: string;
+  title: string;
+  intro: string;
+  lastUpdated: string;
+  body: string;
+};
+
 export type SiteContent = {
   brand: {
     name: string;
@@ -100,6 +108,12 @@ export type SiteContent = {
     body: string;
     button: string;
     steps: string[];
+  };
+  policies: {
+    privacy: PolicyPageContent;
+    terms: PolicyPageContent;
+    serviceInformation: PolicyPageContent;
+    careGuarantee: PolicyPageContent;
   };
   contact: {
     name: string;
@@ -275,6 +289,36 @@ export const defaultSiteContent: SiteContent = {
     body: "Setup takes two minutes on WhatsApp. Your first collection can be this week.",
     button: "Message us on WhatsApp",
     steps: ["Message us to sign up", "Receive your two personal bags", "Drop your first bag on the next collection day"],
+  },
+  policies: {
+    privacy: {
+      eyebrow: "Your data",
+      title: "Privacy Notice",
+      intro: "This notice explains how Washd collects, uses, discloses, stores and protects personal data when you visit our website, create an account, make a payment or use our laundry service.",
+      lastUpdated: "Last updated 4 August 2026",
+      body: "",
+    },
+    terms: {
+      eyebrow: "Clear from the start",
+      title: "Service Terms",
+      intro: "These terms apply when you create a Washd account, purchase a membership or add-on, or give items to us for collection and care.",
+      lastUpdated: "Last updated 4 August 2026",
+      body: "",
+    },
+    serviceInformation: {
+      eyebrow: "Before you subscribe",
+      title: "Service Information",
+      intro: "The supplier, service, price, payment, timing, correction and complaint information for a Washd membership, collected in one place.",
+      lastUpdated: "Last updated 4 August 2026",
+      body: "",
+    },
+    careGuarantee: {
+      eyebrow: "Tracked and accountable",
+      title: "Washd Care Guarantee",
+      intro: "Our numbered-bag and service-history process is designed to keep each member’s laundry identifiable from collection to return.",
+      lastUpdated: "Last updated 4 August 2026",
+      body: "",
+    },
   },
   contact: {
     name: "Pravena K",
