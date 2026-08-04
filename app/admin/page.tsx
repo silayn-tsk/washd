@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeft, BookOpenText, CheckCircle2, ExternalLink, LoaderCircle, LockKeyhole, LogOut, Save, ShieldAlert } from "lucide-react";
+import { ArrowLeft, BookOpenText, CheckCircle2, ExternalLink, LoaderCircle, LockKeyhole, LogOut, Plus, Save, ShieldAlert, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "../auth-provider";
-import { defaultAddons, defaultPlans, defaultSiteContent, mergeSiteContent, type Plan, type PlanAddon, type SiteContent } from "@/lib/site-content";
+import { defaultAddons, defaultPlans, defaultSiteContent, mergeSiteContent, type Plan, type PlanAddon, type PolicyPageContent, type SiteContent } from "@/lib/site-content";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { redirectForAdminMfa, resolveAdminAccess } from "@/lib/admin-access";
 
@@ -70,6 +70,31 @@ function ContentFields({ value, path, onChange }: { value: EditableValue; path: 
   const text = String(value ?? "");
   const multiline = text.length > 64 || ["body", "intro", "footer"].includes(key);
   return <label className={multiline ? "admin-field full" : "admin-field"} data-field={key}><span>{label}</span>{multiline ? <textarea value={text} onChange={(event) => onChange(path, event.target.value)} /> : <input value={text} onChange={(event) => onChange(path, event.target.value)} />}</label>;
+}
+
+function PolicyEditor({ policy, policyKey, onChange }: { policy: PolicyPageContent; policyKey: keyof SiteContent["policies"]; onChange: (path: PathPart[], value: EditableValue) => void }) {
+  const basePath: PathPart[] = ["policies", policyKey];
+  return <div className="admin-policy-workspace">
+    <div className="admin-section-card admin-policy-hero-card">
+      <div className="admin-policy-guidance"><BookOpenText size={19} /><div><strong>Page introduction</strong><p>Edit the text at the top of this policy page. Every field below is published when you select “Save all changes”.</p></div></div>
+      <div className="admin-fields">
+        <label className="admin-field"><span>Eyebrow</span><input value={policy.eyebrow} onChange={(event) => onChange([...basePath, "eyebrow"], event.target.value)} /></label>
+        <label className="admin-field"><span>Page title</span><input value={policy.title} onChange={(event) => onChange([...basePath, "title"], event.target.value)} /></label>
+        <label className="admin-field full"><span>Introduction</span><textarea value={policy.intro} onChange={(event) => onChange([...basePath, "intro"], event.target.value)} /></label>
+        <label className="admin-field"><span>Last updated</span><input value={policy.lastUpdated} onChange={(event) => onChange([...basePath, "lastUpdated"], event.target.value)} /></label>
+      </div>
+    </div>
+
+    <div className="admin-policy-sections-heading"><div><span>Page content</span><h2>Policy sections</h2><p>Edit each visible heading and its complete content directly.</p></div><button type="button" onClick={() => onChange([...basePath, "sections"], [...policy.sections, { heading: "New section", body: "Add the policy content here." }])}><Plus size={16} /> Add section</button></div>
+    <div className="admin-policy-section-list">
+      {policy.sections.map((section, index) => <article className="admin-policy-section" key={index}>
+        <div className="admin-policy-section-top"><span>Section {index + 1}</span><button type="button" aria-label={`Remove section ${index + 1}`} onClick={() => onChange([...basePath, "sections"], policy.sections.filter((_, sectionIndex) => sectionIndex !== index))}><Trash2 size={15} /> Remove</button></div>
+        <label className="admin-field full"><span>Section heading</span><input value={section.heading} onChange={(event) => onChange([...basePath, "sections", index, "heading"], event.target.value)} /></label>
+        <label className="admin-field full"><span>Section content</span><textarea value={section.body} onChange={(event) => onChange([...basePath, "sections", index, "body"], event.target.value)} /></label>
+      </article>)}
+    </div>
+    <div className="admin-policy-token-note"><strong>Automatic details</strong><p>Use <code>{"{email}"}</code>, <code>{"{phone}"}</code>, <code>{"{serviceArea}"}</code>, <code>{"{businessName}"}</code>, <code>{"{website}"}</code>, <code>{"{plans}"}</code> or <code>{"{addons}"}</code> where live business information should appear. Start list items with a hyphen.</p></div>
+  </div>;
 }
 
 export default function AdminPage() {
@@ -189,16 +214,13 @@ export default function AdminPage() {
         </aside>
 
         <section className="admin-editor">
-          <div className="admin-editor-heading"><div className="admin-editor-title"><span>Editing</span><h1>{activeTitle}</h1><p>{activePolicyKey ? "Edit the English policy heading, update date and optional replacement body." : "Shape the public Washd experience, then review and publish when ready."}</p></div><div className="admin-workspace-status"><span>Publishing mode</span><strong><i /> Review, then save</strong></div></div>
+          <div className="admin-editor-heading"><div className="admin-editor-title"><span>Editing</span><h1>{activeTitle}</h1><p>{activePolicyKey ? "Edit the complete English policy page, section by section." : "Shape the public Washd experience, then review and publish when ready."}</p></div><div className="admin-workspace-status"><span>Publishing mode</span><strong><i /> Review, then save</strong></div></div>
           {notice && <div className="admin-notice success"><CheckCircle2 size={18} /> {notice}</div>}
           {error && <div className="admin-notice error"><ShieldAlert size={18} /> {error}</div>}
 
           <div className="admin-panel-transition" key={activeSection}>
           {activePolicyKey ? (
-            <div className="admin-section-card admin-policy-card">
-              <div className="admin-policy-guidance"><BookOpenText size={19} /><div><strong>English master policy</strong><p>Leave “Body” empty to keep the current policy wording. To replace it, start every section with <code>## Section heading</code>, followed by its text. Translated pages keep their existing reviewed copy.</p></div></div>
-              <ContentFields value={content.policies[activePolicyKey] as unknown as EditableValue} path={["policies", activePolicyKey]} onChange={updateContent} />
-            </div>
+            <PolicyEditor policy={content.policies[activePolicyKey]} policyKey={activePolicyKey} onChange={updateContent} />
           ) : activeSection === "plans" ? (
             <div className="admin-plan-list">
               {plans.map((plan, index) => (
