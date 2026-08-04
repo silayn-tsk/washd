@@ -1,0 +1,7 @@
+1:"$Sreact.fragment"
+2:I[26381,["/_next/static/chunks/0owg4i.b7h11x.js","/_next/static/chunks/0l6flelgmo4zp.js","/_next/static/chunks/0~b27bnf2au~~.js","/_next/static/chunks/0qks3kev-jqbf.js","/_next/static/chunks/16qyt1x1dngdr.js"],"LegalShell"]
+3:I[32760,["/_next/static/chunks/0owg4i.b7h11x.js","/_next/static/chunks/0l6flelgmo4zp.js","/_next/static/chunks/0~b27bnf2au~~.js","/_next/static/chunks/0qks3kev-jqbf.js","/_next/static/chunks/16qyt1x1dngdr.js"],"PrivacyLocalized"]
+4:I[97367,["/_next/static/chunks/0owg4i.b7h11x.js","/_next/static/chunks/0l6flelgmo4zp.js","/_next/static/chunks/0~b27bnf2au~~.js"],"OutletBoundary"]
+5:"$Sreact.suspense"
+0:{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"policyPath":"/privacy","locale":"ko","eyebrow":"귀하의 정보","title":"개인정보 처리방침","intro":"웹사이트 방문, 계정 생성, 결제 또는 세탁 서비스 이용 시 Washd가 개인정보를 수집·이용·제공·보관·보호하는 방법을 설명합니다.","children":["$","$L3",null,{"locale":"ko"}]}],[["$","script","script-0",{"src":"/_next/static/chunks/0qks3kev-jqbf.js","async":true}],["$","script","script-1",{"src":"/_next/static/chunks/16qyt1x1dngdr.js","async":true}]],["$","$L4",null,{"children":["$","$5",null,{"name":"Next.MetadataOutlet","children":"$@6"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"SnZQkJu4L_Th5NFSyMY5b"}
+6:null

@@ -1,0 +1,7 @@
+1:"$Sreact.fragment"
+2:I[26381,["/_next/static/chunks/0owg4i.b7h11x.js","/_next/static/chunks/0l6flelgmo4zp.js","/_next/static/chunks/0~b27bnf2au~~.js","/_next/static/chunks/0qks3kev-jqbf.js","/_next/static/chunks/16qyt1x1dngdr.js"],"LegalShell"]
+3:I[32760,["/_next/static/chunks/0owg4i.b7h11x.js","/_next/static/chunks/0l6flelgmo4zp.js","/_next/static/chunks/0~b27bnf2au~~.js","/_next/static/chunks/0qks3kev-jqbf.js","/_next/static/chunks/16qyt1x1dngdr.js"],"ServiceInformationLocalized"]
+4:I[97367,["/_next/static/chunks/0owg4i.b7h11x.js","/_next/static/chunks/0l6flelgmo4zp.js","/_next/static/chunks/0~b27bnf2au~~.js"],"OutletBoundary"]
+5:"$Sreact.suspense"
+0:{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"policyPath":"/service-information","locale":"ko","eyebrow":"구독하기 전에","title":"서비스 정보","intro":"Washd 멤버십의 제공업체, 서비스, 가격, 결제, 일정, 정정 및 민원 정보를 한곳에서 확인할 수 있습니다.","children":["$","$L3",null,{"locale":"ko"}]}],[["$","script","script-0",{"src":"/_next/static/chunks/0qks3kev-jqbf.js","async":true}],["$","script","script-1",{"src":"/_next/static/chunks/16qyt1x1dngdr.js","async":true}]],["$","$L4",null,{"children":["$","$5",null,{"name":"Next.MetadataOutlet","children":"$@6"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"SnZQkJu4L_Th5NFSyMY5b"}
+6:null

@@ -1,0 +1,9 @@
+User-Agent: *
+Allow: /
+Disallow: /admin
+Disallow: /account
+Disallow: /mfa
+Disallow: /reset-password
+
+Host: https://washd-my-86c6d.web.app
+Sitemap: https://washd-my-86c6d.web.app/sitemap.xml

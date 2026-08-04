@@ -1,0 +1,39 @@
+project_id = "washd"
+
+[auth]
+site_url = "https://washd-my-86c6d.web.app"
+additional_redirect_urls = [
+  "https://washd-my-86c6d.web.app/**",
+  "http://localhost:3000/**",
+  "http://127.0.0.1:3000/**"
+]
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+enable_confirmations = true
+secure_password_change = true
+max_frequency = "1m0s"
+otp_length = 8
+
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+
+[storage.vector]
+enabled = false
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.configure-stripe]
+verify_jwt = false
+
+[functions.admin-save-plans]
+verify_jwt = true
+
+[functions.admin-update-tracking]
+verify_jwt = true
+
+[functions.admin-payment-readiness]
+verify_jwt = true

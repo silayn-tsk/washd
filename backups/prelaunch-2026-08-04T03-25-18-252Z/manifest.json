@@ -1,0 +1,18 @@
+{
+  "createdAt": "2026-08-04T03:25:18.258Z",
+  "projectRef": "egrhyqdrqdaupvxiyurf",
+  "purpose": "Recovery snapshot before removing Washd prelaunch test records",
+  "counts": {
+    "bags": 1,
+    "plans": 6,
+    "profiles": 2,
+    "auth_users": 2,
+    "collections": 2,
+    "plan_addons": 4,
+    "site_admins": 1,
+    "site_content": 1,
+    "stripe_events": 133,
+    "contact_requests": 2
+  },
+  "warning": "Contains personal and operational data. Keep encrypted and access-controlled."
+}

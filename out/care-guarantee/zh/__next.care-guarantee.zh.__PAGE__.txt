@@ -1,0 +1,7 @@
+1:"$Sreact.fragment"
+2:I[26381,["/_next/static/chunks/0owg4i.b7h11x.js","/_next/static/chunks/0l6flelgmo4zp.js","/_next/static/chunks/0~b27bnf2au~~.js","/_next/static/chunks/0qks3kev-jqbf.js","/_next/static/chunks/16qyt1x1dngdr.js"],"LegalShell"]
+3:I[32760,["/_next/static/chunks/0owg4i.b7h11x.js","/_next/static/chunks/0l6flelgmo4zp.js","/_next/static/chunks/0~b27bnf2au~~.js","/_next/static/chunks/0qks3kev-jqbf.js","/_next/static/chunks/16qyt1x1dngdr.js"],"CareGuaranteeLocalized"]
+4:I[97367,["/_next/static/chunks/0owg4i.b7h11x.js","/_next/static/chunks/0l6flelgmo4zp.js","/_next/static/chunks/0~b27bnf2au~~.js"],"OutletBoundary"]
+5:"$Sreact.suspense"
+0:{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"policyPath":"/care-guarantee","locale":"zh","eyebrow":"可追踪、有责任","title":"Washd 护理保障","intro":"我们的编号洗衣袋及服务记录流程，旨在确保每位会员的衣物从收集至送回均可识别。","children":["$","$L3",null,{"locale":"zh"}]}],[["$","script","script-0",{"src":"/_next/static/chunks/0qks3kev-jqbf.js","async":true}],["$","script","script-1",{"src":"/_next/static/chunks/16qyt1x1dngdr.js","async":true}]],["$","$L4",null,{"children":["$","$5",null,{"name":"Next.MetadataOutlet","children":"$@6"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"SnZQkJu4L_Th5NFSyMY5b"}
+6:null
