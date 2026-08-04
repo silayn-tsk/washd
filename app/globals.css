@@ -635,11 +635,11 @@ h1 em, h2 em { color: #4f83ed; font-weight: 390; }
 
 /* Member experience, plan journey and heritage additions */
 .heritage-section { padding: 105px clamp(28px,7vw,112px); color: white; background: #0A2E36; display: grid; grid-template-columns: .65fr 1.35fr; gap: clamp(50px,9vw,140px); align-items: center; overflow: hidden; }
-.heritage-year { min-height: 330px; position: relative; border: 1px solid rgba(201,168,106,.35); display: grid; place-content: center; text-align: center; background: radial-gradient(circle,rgba(26,122,140,.22),transparent 64%); }
+.heritage-year { min-height: 330px; position: relative; border: 0; display: grid; place-content: center; text-align: center; background: radial-gradient(circle,rgba(26,122,140,.22),transparent 64%); }
 .heritage-year::before, .heritage-year::after { content: ""; position: absolute; border: 1px solid rgba(255,255,255,.08); border-radius: 50%; }
 .heritage-year::before { inset: -60px; }.heritage-year::after { inset: 28px; }
 .heritage-year span { color: #C9A86A; font: 700 10px/1 var(--font-roboto), Arial, sans-serif; letter-spacing: .22em; text-transform: uppercase; }
-.heritage-year strong { font: 600 clamp(72px,9vw,132px)/.9 var(--font-montserrat), Arial, sans-serif; letter-spacing: -.07em; }
+.heritage-year strong { font: 650 clamp(72px,9vw,132px)/.9 var(--font-inter), Arial, sans-serif; letter-spacing: -.065em; }
 .heritage-copy h2 { margin: 19px 0 24px; font-size: clamp(48px,5vw,78px); line-height: .98; }
 .heritage-copy h2 em { color: #C9A86A; font-style: normal; }
 .heritage-copy > p { max-width: 720px; color: rgba(255,255,255,.62); font-size: 16px; line-height: 1.75; }
@@ -982,6 +982,9 @@ h1 em, h2 em { color: #4f83ed; font-weight: 390; }
 .floating-whatsapp { position: fixed; right: clamp(16px,2vw,28px); bottom: max(18px,env(safe-area-inset-bottom)); z-index: 90; min-height: 52px; padding: 0 20px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; color: #06232A; background: #55d67c; border: 1px solid rgba(6,35,42,.12); box-shadow: 0 14px 34px rgba(6,35,42,.26); font-size: 13px; font-weight: 800; transition: transform .2s ease, opacity .2s ease, visibility .2s ease; }
 .floating-whatsapp:hover { transform: translateY(-2px); }
 .floating-whatsapp.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.floating-back-to-top { position: fixed; left: clamp(16px,2vw,28px); bottom: max(18px,env(safe-area-inset-bottom)); z-index: 90; min-height: 52px; padding: 0 20px; border: 1px solid rgba(255,255,255,.17); border-radius: 999px; color: white; background: #0A2E36; box-shadow: 0 14px 34px rgba(6,35,42,.24); display: inline-flex; align-items: center; justify-content: center; gap: 8px; font: 800 13px/1 var(--font-inter), Arial, sans-serif; cursor: pointer; opacity: 0; visibility: hidden; translate: 0 14px; transition: translate .25s ease, opacity .25s ease, visibility .25s ease, background .25s ease; }
+.floating-back-to-top.visible { opacity: 1; visibility: visible; translate: 0 0; }
+.floating-back-to-top:hover { translate: 0 -2px; background: #1A7A8C; }
 
 /* Organic card system and scroll motion */
 .deck-card, .routine-card, .service-block, .deck-plan, .promise-card, .building-points > div, .enquiry-form { transition: border-radius .4s ease, box-shadow .4s ease, translate .4s cubic-bezier(.16,1,.3,1), transform .4s cubic-bezier(.16,1,.3,1), rotate .4s ease, background-color .4s ease; }
@@ -1044,8 +1047,8 @@ h1 em, h2 em { color: #4f83ed; font-weight: 390; }
 .building-points > div:hover { translate: -8px 0; background: #f5ead4; }
 .building-points > div:nth-child(even):hover { translate: 8px 0; }
 
-.enquiry-form { border-radius: 38px 120px 38px 38px; overflow: hidden; box-shadow: 0 32px 78px rgba(0,0,0,.23); }
-.enquiry-form::before { content: ""; position: absolute; right: -75px; top: -85px; width: 190px; height: 190px; border-radius: 50%; background: rgba(201,168,106,.16); pointer-events: none; }
+.enquiry-form { border-radius: 38px; overflow: hidden; box-shadow: 0 32px 78px rgba(0,0,0,.23); }
+.enquiry-form::before { content: ""; position: absolute; right: -58px; top: -64px; width: 145px; height: 145px; border-radius: 50%; background: rgba(201,168,106,.13); pointer-events: none; }
 .enquiry-form > * { position: relative; z-index: 1; }
 
 .deck-heading.reveal { --reveal-x: -28px; --reveal-y: 18px; }
@@ -1105,6 +1108,7 @@ h1 em, h2 em { color: #4f83ed; font-weight: 390; }
   .enquiry-form label, .enquiry-form input, .enquiry-form textarea { min-width: 0; max-width: 100%; box-sizing: border-box; }
   .deck-final-cta h2 { font-size: 58px; }
   .floating-whatsapp { right: 14px; min-height: 50px; padding: 0 17px; }
+  .floating-back-to-top { left: 14px; min-height: 50px; padding: 0 17px; }
   .deck-footer { grid-template-columns: 1fr 1fr; padding-left: 20px; padding-right: 20px; }
   .deck-footer > div:first-child, .deck-footer > div:last-of-type { grid-column: 1/-1; }
 }

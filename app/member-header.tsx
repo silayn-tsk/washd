@@ -8,11 +8,10 @@ export function MemberHeader() {
 
   return (
     <header className="member-header">
-      <Link className="brand" href="/" aria-label="Washd home">
+      <Link className="brand" href={user ? "/account" : "/"} aria-label={user ? "Washd dashboard" : "Washd home"}>
         <span>washd<span className="brand-dot">.</span></span>
       </Link>
       <nav aria-label="Member navigation">
-        <Link className="member-home-link" href="/">Home</Link>
         {user && <Link className="member-dashboard-link" href="/account">Dashboard</Link>}
         <Link href="/plans">Plans</Link>
         {!loading && (

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import {
   ArrowRight,
+  ArrowUp,
   Building2,
   CalendarCheck,
   Camera,
@@ -40,6 +41,7 @@ export default function Home() {
   const [enquiry, setEnquiry] = useState({ name: "", email: "", phone: "", residence: "", message: "" });
   const [enquiryBusy, setEnquiryBusy] = useState(false);
   const [enquiryStatus, setEnquiryStatus] = useState<"" | "success" | "error">("");
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -56,6 +58,13 @@ export default function Home() {
     if (!target) return;
     requestAnimationFrame(() => target.scrollIntoView({ block: "start" }));
   }, [contentLoading]);
+
+  useEffect(() => {
+    const updateBackToTop = () => setShowBackToTop(window.scrollY > 500);
+    updateBackToTop();
+    window.addEventListener("scroll", updateBackToTop, { passive: true });
+    return () => window.removeEventListener("scroll", updateBackToTop);
+  }, []);
 
   const joinUrl = whatsappUrl(content);
   const buildingUrl = whatsappUrl(content, "Hi Washd, I'd like to discuss bringing Washd to our building.");
@@ -276,9 +285,19 @@ export default function Home() {
         <div><a className="deck-brand deck-footer-brand" href="#top"><span className="deck-wordmark">washd<i>.</i></span></a><p>{content.brand.tagline}<br />While you live your life.</p></div>
         <div><strong>Explore</strong><a href="#how">How it works</a><a href="#services">Services</a><a href="/plans">Membership plans</a></div>
         <div><strong>Contact</strong><a href={joinUrl} target="_blank" rel="noreferrer">{content.contact.phoneDisplay}</a><a href={`mailto:${content.contact.email}`}>{content.contact.email}</a><span>{content.contact.serviceArea}</span></div>
-        <div><strong>Members & policies</strong><a href="/login">Log in</a><a href="/login?next=/account">My account</a><a href="/privacy">Privacy notice</a><a href="/terms">Service terms</a><a href="/service-information">Service information</a><a href="/care-guarantee">Care guarantee</a></div>
+        <div><strong>Members & policies</strong><a href="/login">Log in</a><a href="/privacy">Privacy notice</a><a href="/terms">Service terms</a><a href="/service-information">Service information</a><a href="/care-guarantee">Care guarantee</a></div>
         <small>© 2026 Washd. {content.brand.tagline}{content.contact.legalName && <> · {content.contact.legalName}{content.contact.registrationNumber && ` (${content.contact.registrationNumber})`}</>}</small>
       </footer>
+
+      <button
+        className={showBackToTop && !menuOpen ? "floating-back-to-top visible" : "floating-back-to-top"}
+        type="button"
+        aria-label="Back to top"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      >
+        <ArrowUp size={20} aria-hidden="true" />
+        <span>Top</span>
+      </button>
 
       <a
         className={menuOpen ? "floating-whatsapp hidden" : "floating-whatsapp"}
