@@ -99,8 +99,7 @@ export default function Home() {
           <a href="#services" onClick={() => setMenuOpen(false)}>Services</a>
           <a href="#plans" onClick={() => setMenuOpen(false)}>Plans</a>
           <a href="#safety" onClick={() => setMenuOpen(false)}>Our promise</a>
-          <a href="/login">Member login</a>
-          <a className="deck-button small" href={joinUrl} target="_blank" rel="noreferrer">WhatsApp us <ArrowRight size={16} /></a>
+          <a className="deck-button small member-login-cta" href="/login">Member login <ArrowRight size={16} /></a>
         </nav>
         <button className="deck-menu" type="button" aria-label={menuOpen ? "Close menu" : "Open menu"} onClick={() => setMenuOpen((value) => !value)}>
           {menuOpen ? <X /> : <Menu />}
@@ -277,7 +276,7 @@ export default function Home() {
         <div><a className="deck-brand deck-footer-brand" href="#top"><span className="deck-wordmark">washd<i>.</i></span></a><p>{content.brand.tagline}<br />While you live your life.</p></div>
         <div><strong>Explore</strong><a href="#how">How it works</a><a href="#services">Services</a><a href="/plans">Membership plans</a></div>
         <div><strong>Contact</strong><a href={joinUrl} target="_blank" rel="noreferrer">{content.contact.phoneDisplay}</a><a href={`mailto:${content.contact.email}`}>{content.contact.email}</a><span>{content.contact.serviceArea}</span></div>
-        <div><strong>Members & policies</strong><a href="/login">Log in</a><a href="/account">My account</a><a href="/privacy">Privacy notice</a><a href="/terms">Service terms</a><a href="/service-information">Service information</a><a href="/care-guarantee">Care guarantee</a></div>
+        <div><strong>Members & policies</strong><a href="/login">Log in</a><a href="/login?next=/account">My account</a><a href="/privacy">Privacy notice</a><a href="/terms">Service terms</a><a href="/service-information">Service information</a><a href="/care-guarantee">Care guarantee</a></div>
         <small>© 2026 Washd. {content.brand.tagline}{content.contact.legalName && <> · {content.contact.legalName}{content.contact.registrationNumber && ` (${content.contact.registrationNumber})`}</>}</small>
       </footer>
 
