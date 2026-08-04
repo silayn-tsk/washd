@@ -15,6 +15,7 @@
     "launch:check": "node scripts/launch-readiness.mjs",
     "backup:production": "node scripts/backup-production.mjs",
     "backup:production:dry-run": "node scripts/backup-production.mjs --dry-run",
+    "backup:prelaunch": "node scripts/snapshot-prelaunch-data.mjs",
     "auth:emails:check": "node scripts/configure-auth-emails.mjs",
     "auth:emails:apply": "node scripts/configure-auth-emails.mjs --apply",
     "auth:smtp:check": "node scripts/configure-smtp.mjs",

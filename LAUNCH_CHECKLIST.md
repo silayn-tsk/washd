@@ -62,6 +62,9 @@ This is the production go/no-go list. A box should only be checked after it is v
 ## Day 6 — Launch rehearsal
 
 - [ ] Remove demo users, test subscriptions and misleading sample data from production.
+- [x] Inventory prelaunch member, enquiry, tracking and Stripe-event data without deleting records.
+- [x] Create a permission-restricted pre-cleanup snapshot of Auth and operational records.
+- [ ] Move the pre-cleanup snapshot to encrypted owner-controlled storage.
 - [x] Commit the verified launch candidate after checking tracked filenames and pending content for common private-key and payment-secret patterns.
 - [ ] Push/copy the launch branch to an owner-controlled off-device source repository.
 - [ ] Export/record the current Supabase schema, secrets list and Stripe configuration.
@@ -88,6 +91,7 @@ This is the production go/no-go list. A box should only be checked after it is v
 7. Launch-day operating roles and collection-venue contacts still need named owners.
 8. Cloudflare Turnstile keys have not been created or enabled in Supabase yet; the frontend integration is staged but intentionally dormant.
 9. The launch source is committed locally, but the legacy source remote is inaccessible; create an owner-controlled off-device copy before launch.
+10. Production still contains one demo member, two test enquiries, admin test checkout data and the Stripe test event ledger; owner approval is required before destructive cleanup.
 
 ## Latest QA baseline — 4 August 2026
 
@@ -102,3 +106,4 @@ This is the production go/no-go list. A box should only be checked after it is v
 - Admin MFA is deployed but intentionally not enforced until the owner scans the QR code and verifies the first six-digit code.
 - Hosted Auth now permits redirects only to the production Firebase origin; localhost recovery redirects were removed.
 - Branded Auth templates are staged, but Supabase requires custom SMTP before free-tier template changes can be applied.
+- `PRELAUNCH_DATA_AUDIT.md` records the exact test-data cleanup proposal. The owner/member separation fix is deployed so the admin account will not consume a future customer ID.
