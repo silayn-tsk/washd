@@ -94,3 +94,33 @@ test("keeps the product implementation free of starter preview code", async () =
   assert.doesNotMatch(page + layout + siteUrl + packageJson, /SkeletonPreview|codex-preview|react-loading-skeleton/);
   await assert.rejects(access(new URL("../app/_sites-preview/SkeletonPreview.tsx", import.meta.url)));
 });
+
+test("renders each policy in English, Malay, Chinese and Korean", async () => {
+  const pages = await Promise.all([
+    render("/privacy/zh").then((response) => response.text()),
+    render("/privacy/ko").then((response) => response.text()),
+    render("/terms/zh").then((response) => response.text()),
+    render("/terms/ko").then((response) => response.text()),
+    render("/service-information/bm").then((response) => response.text()),
+    render("/service-information/zh").then((response) => response.text()),
+    render("/service-information/ko").then((response) => response.text()),
+    render("/care-guarantee/zh").then((response) => response.text()),
+    render("/care-guarantee/ko").then((response) => response.text()),
+  ]);
+
+  assert.match(pages[0], /隐私声明/);
+  assert.match(pages[1], /개인정보 처리방침/);
+  assert.match(pages[2], /服务条款/);
+  assert.match(pages[3], /서비스 약관/);
+  assert.match(pages[4], /Maklumat Perkhidmatan/);
+  assert.match(pages[5], /服务资料/);
+  assert.match(pages[6], /서비스 정보/);
+  assert.match(pages[7], /护理保障/);
+  assert.match(pages[8], /케어 보장/);
+  for (const html of pages) {
+    assert.match(html, /English/);
+    assert.match(html, /Bahasa Malaysia/);
+    assert.match(html, /中文/);
+    assert.match(html, /한국어/);
+  }
+});

@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { LegalShell } from "../legal-shell";
 
-export const metadata: Metadata = { title: "Service Terms — Washd", description: "Terms for Washd laundry memberships, collections, payments and cancellations.", alternates: { canonical: "/terms", languages: { "en-MY": "/terms", "ms-MY": "/terms/bm" } } };
+export const metadata: Metadata = { title: "Service Terms — Washd", description: "Terms for Washd laundry memberships, collections, payments and cancellations.", alternates: { canonical: "/terms", languages: { "en-MY": "/terms", "ms-MY": "/terms/bm", "zh-CN": "/terms/zh", "ko-KR": "/terms/ko" } } };
 
 export default function TermsPage() {
   return (
-    <LegalShell eyebrow="Clear from the start" title="Service Terms" intro="These terms apply when you create a Washd account, purchase a membership or add-on, or give items to us for collection and care.">
-      <div className="legal-language"><strong>English</strong><Link href="/terms/bm">Bahasa Malaysia</Link></div>
+    <LegalShell policyPath="/terms" eyebrow="Clear from the start" title="Service Terms" intro="These terms apply when you create a Washd account, purchase a membership or add-on, or give items to us for collection and care.">
       <section><h2>1. The service</h2><p>Washd provides recurring laundry collection and return services at selected residential buildings in Kuala Lumpur. Availability depends on an active route, collection point and service capacity. The plan detail shown before payment states the included bag size, frequency, pressed pieces, add-ons, price and current collection rhythm.</p></section>
       <section><h2>2. Accounts and eligibility</h2><p>You must provide accurate contact, residence and collection information and keep your login secure. An account is personal to the member and should not be shared. You must be at least 18 years old or have permission from a parent or legal guardian to subscribe.</p></section>
       <section><h2>3. Memberships, prices and payment</h2><p>Prices are displayed in Malaysian Ringgit before checkout. A membership renews monthly until cancelled. Stripe processes payment using the method you provide. By confirming checkout, you authorise the recurring plan price and selected recurring add-ons. Any taxes or unavoidable additional charges will be shown before payment where applicable.</p><p>If payment fails, we may retry payment, ask you to update the payment method, pause collections or end the membership. A successful checkout is confirmed on screen and in your Washd account.</p></section>

@@ -1,17 +1,15 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { LegalShell } from "../legal-shell";
 
 export const metadata: Metadata = {
   title: "Privacy Notice — Washd",
   description: "How Washd collects, uses, shares and protects personal data.",
-  alternates: { canonical: "/privacy", languages: { "en-MY": "/privacy", "ms-MY": "/privacy/bm" } },
+  alternates: { canonical: "/privacy", languages: { "en-MY": "/privacy", "ms-MY": "/privacy/bm", "zh-CN": "/privacy/zh", "ko-KR": "/privacy/ko" } },
 };
 
 export default function PrivacyPage() {
   return (
-    <LegalShell eyebrow="Your data" title="Privacy Notice" intro="This notice explains how Washd collects, uses, discloses, stores and protects personal data when you visit our website, create an account, make a payment or use our laundry service.">
-      <div className="legal-language"><strong>English</strong><Link href="/privacy/bm">Bahasa Malaysia</Link></div>
+    <LegalShell policyPath="/privacy" eyebrow="Your data" title="Privacy Notice" intro="This notice explains how Washd collects, uses, discloses, stores and protects personal data when you visit our website, create an account, make a payment or use our laundry service.">
       <section><h2>1. Who is responsible for your data?</h2><p>Washd is the data controller for the personal data described in this notice. You can contact us at <a href="mailto:washdmy@gmail.com">washdmy@gmail.com</a>, call or WhatsApp <a href="https://wa.me/60176494749">017-649 4749</a>, or write to us through the enquiry form on this website.</p></section>
       <section><h2>2. Personal data we collect</h2><p>Depending on how you interact with Washd, we may collect:</p><ul><li>your name, email address, telephone number, residence, unit and collection-point information;</li><li>account identifiers, login and security information;</li><li>membership, add-on, billing status and Stripe transaction references—we do not store your full card number;</li><li>bag identifiers, garment or item counts, collection details, service history, photographs used for service verification and care requests;</li><li>enquiry messages, support conversations and preferences; and</li><li>technical and security information such as browser, device, IP address, timestamps and authentication activity.</li></ul></section>
       <section><h2>3. Where the data comes from</h2><p>We receive data directly from you when you register, subscribe, submit a form or contact us; from our team when we collect and process your laundry; automatically when you use our website or account; and from payment and technology providers when they confirm a transaction, login or system event.</p></section>

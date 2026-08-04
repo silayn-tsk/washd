@@ -9,9 +9,9 @@ const timeoutMs = Number(process.env.WASHD_CHECK_TIMEOUT_MS || 15000);
 const attempts = Number(process.env.WASHD_CHECK_ATTEMPTS || 2);
 
 const routes = [
-  "/", "/login", "/signup", "/plans", "/account", "/privacy", "/privacy/bm",
-  "/terms", "/terms/bm", "/service-information", "/maklumat-perkhidmatan",
-  "/care-guarantee", "/care-guarantee/bm", "/admin", "/admin/enquiries", "/admin/payments",
+  "/", "/login", "/signup", "/plans", "/account", "/privacy", "/privacy/bm", "/privacy/zh", "/privacy/ko",
+  "/terms", "/terms/bm", "/terms/zh", "/terms/ko", "/service-information", "/service-information/bm", "/service-information/zh", "/service-information/ko",
+  "/care-guarantee", "/care-guarantee/bm", "/care-guarantee/zh", "/care-guarantee/ko", "/admin", "/admin/enquiries", "/admin/payments",
   "/admin/security", "/admin/tracking", "/mfa", "/robots.txt", "/sitemap.xml",
 ];
 
@@ -92,7 +92,7 @@ try {
   const robots = await (await request("/robots.txt")).text();
   const sitemap = await (await request("/sitemap.xml")).text();
   const robotsOk = robots.includes("Disallow: /admin") && robots.includes("Disallow: /mfa") && robots.includes("Sitemap:");
-  const sitemapOk = sitemap.includes("<urlset") && sitemap.includes("/plans") && sitemap.includes("/maklumat-perkhidmatan") && sitemap.includes("/terms/bm");
+  const sitemapOk = sitemap.includes("<urlset") && sitemap.includes("/plans") && sitemap.includes("/service-information/bm") && sitemap.includes("/terms/zh") && sitemap.includes("/privacy/ko");
   results.push({ check: "robots.txt launch rules", ok: robotsOk, detail: robotsOk ? "present" : "incomplete" });
   results.push({ check: "sitemap.xml", ok: sitemapOk, detail: sitemapOk ? "valid baseline" : "incomplete" });
   failed ||= !robotsOk || !sitemapOk;

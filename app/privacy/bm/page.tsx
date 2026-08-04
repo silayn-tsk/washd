@@ -1,17 +1,15 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { LegalShell } from "../../legal-shell";
 
 export const metadata: Metadata = {
   title: "Notis Privasi — Washd",
   description: "Cara Washd mengumpul, menggunakan, berkongsi dan melindungi data peribadi.",
-  alternates: { canonical: "/privacy/bm", languages: { "en-MY": "/privacy", "ms-MY": "/privacy/bm" } },
+  alternates: { canonical: "/privacy/bm", languages: { "en-MY": "/privacy", "ms-MY": "/privacy/bm", "zh-CN": "/privacy/zh", "ko-KR": "/privacy/ko" } },
 };
 
 export default function PrivacyBmPage() {
   return (
-    <LegalShell locale="ms" eyebrow="Data anda" title="Notis Privasi" intro="Notis ini menerangkan cara Washd mengumpul, menggunakan, menzahirkan, menyimpan dan melindungi data peribadi apabila anda melawat laman web, membuka akaun, membuat bayaran atau menggunakan perkhidmatan dobi kami.">
-      <div className="legal-language"><Link href="/privacy">English</Link><strong>Bahasa Malaysia</strong></div>
+    <LegalShell policyPath="/privacy" locale="ms" eyebrow="Data anda" title="Notis Privasi" intro="Notis ini menerangkan cara Washd mengumpul, menggunakan, menzahirkan, menyimpan dan melindungi data peribadi apabila anda melawat laman web, membuka akaun, membuat bayaran atau menggunakan perkhidmatan dobi kami.">
       <section><h2>1. Siapa yang bertanggungjawab terhadap data anda?</h2><p>Washd ialah pengawal data bagi data peribadi yang diterangkan dalam notis ini. Hubungi kami melalui <a href="mailto:washdmy@gmail.com">washdmy@gmail.com</a>, telefon atau WhatsApp <a href="https://wa.me/60176494749">017-649 4749</a>, atau borang pertanyaan di laman web ini.</p></section>
       <section><h2>2. Data peribadi yang kami kumpulkan</h2><p>Bergantung pada cara anda berinteraksi dengan Washd, kami mungkin mengumpulkan:</p><ul><li>nama, alamat e-mel, nombor telefon, kediaman, unit dan maklumat tempat pengumpulan;</li><li>pengenal akaun serta maklumat log masuk dan keselamatan;</li><li>keahlian, tambahan, status pengebilan dan rujukan transaksi Stripe—kami tidak menyimpan nombor penuh kad anda;</li><li>pengenal beg, kiraan pakaian atau item, butiran pengumpulan, sejarah perkhidmatan, gambar pengesahan perkhidmatan dan permintaan penjagaan;</li><li>mesej pertanyaan, perbualan sokongan dan keutamaan; dan</li><li>maklumat teknikal dan keselamatan seperti pelayar, peranti, alamat IP, cap masa dan aktiviti pengesahan.</li></ul></section>
       <section><h2>3. Sumber data</h2><p>Kami menerima data secara terus daripada anda semasa pendaftaran, langganan, penghantaran borang atau apabila anda menghubungi kami; daripada pasukan kami semasa pengumpulan dan pemprosesan dobi; secara automatik apabila anda menggunakan laman web atau akaun; dan daripada penyedia bayaran serta teknologi apabila mereka mengesahkan transaksi, log masuk atau peristiwa sistem.</p></section>

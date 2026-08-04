@@ -2,11 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalShell } from "../../legal-shell";
 
-export const metadata: Metadata = { title: "Terma Perkhidmatan — Washd", description: "Terma keahlian dobi, pengumpulan, bayaran dan pembatalan Washd.", alternates: { canonical: "/terms/bm", languages: { "en-MY": "/terms", "ms-MY": "/terms/bm" } } };
+export const metadata: Metadata = { title: "Terma Perkhidmatan — Washd", description: "Terma keahlian dobi, pengumpulan, bayaran dan pembatalan Washd.", alternates: { canonical: "/terms/bm", languages: { "en-MY": "/terms", "ms-MY": "/terms/bm", "zh-CN": "/terms/zh", "ko-KR": "/terms/ko" } } };
 
 export default function TermsBmPage() {
-  return <LegalShell locale="ms" eyebrow="Jelas dari awal" title="Terma Perkhidmatan" intro="Terma ini terpakai apabila anda membuka akaun Washd, membeli keahlian atau tambahan, atau menyerahkan barangan kepada kami untuk pengumpulan dan penjagaan.">
-    <div className="legal-language"><Link href="/terms">English</Link><strong>Bahasa Malaysia</strong></div>
+  return <LegalShell policyPath="/terms" locale="ms" eyebrow="Jelas dari awal" title="Terma Perkhidmatan" intro="Terma ini terpakai apabila anda membuka akaun Washd, membeli keahlian atau tambahan, atau menyerahkan barangan kepada kami untuk pengumpulan dan penjagaan.">
     <section><h2>1. Perkhidmatan</h2><p>Washd menyediakan perkhidmatan pengumpulan dan pemulangan dobi berulang di bangunan kediaman terpilih di Kuala Lumpur. Ketersediaan bergantung pada laluan aktif, tempat pengumpulan dan kapasiti perkhidmatan. Butiran pelan sebelum bayaran menyatakan saiz beg, kekerapan, bilangan pakaian bergosok, tambahan, harga dan jadual pengumpulan semasa.</p></section>
     <section><h2>2. Akaun dan kelayakan</h2><p>Anda mesti memberikan maklumat perhubungan, kediaman dan pengumpulan yang tepat serta menjaga keselamatan log masuk. Akaun adalah peribadi kepada ahli dan tidak boleh dikongsi. Anda mestilah berumur sekurang-kurangnya 18 tahun atau mempunyai kebenaran ibu bapa atau penjaga sah untuk melanggan.</p></section>
     <section><h2>3. Keahlian, harga dan bayaran</h2><p>Harga dipaparkan dalam Ringgit Malaysia sebelum pembayaran. Keahlian diperbaharui setiap bulan sehingga dibatalkan. Stripe memproses bayaran menggunakan kaedah yang anda berikan. Dengan mengesahkan pembayaran, anda membenarkan caj berulang bagi harga pelan dan tambahan berulang terpilih. Apa-apa cukai atau caj tambahan yang tidak dapat dielakkan akan dipaparkan sebelum bayaran jika berkenaan.</p><p>Jika bayaran gagal, kami boleh mencuba semula, meminta anda mengemas kini kaedah bayaran, menjeda pengumpulan atau menamatkan keahlian. Pembayaran yang berjaya disahkan pada skrin dan dalam akaun Washd.</p></section>
