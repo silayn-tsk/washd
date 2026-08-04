@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AlertTriangle, ArrowLeft, CheckCircle2, CreditCard, LoaderCircle, RefreshCw, ShieldAlert, WashingMachine, Webhook } from "lucide-react";
+import { AlertTriangle, ArrowLeft, CheckCircle2, CreditCard, LoaderCircle, RefreshCw, ShieldAlert, Webhook } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "../../auth-provider";
 import { supabase } from "@/lib/supabase";
@@ -101,7 +101,7 @@ export default function AdminPaymentsPage() {
 
   return (
     <main className="admin-page payment-admin-page">
-      <header className="admin-header"><div><Link className="admin-brand" href="/admin"><WashingMachine size={22} /><span>Washd payments</span></Link></div><div><Link className="admin-preview" href="/admin"><ArrowLeft size={15} /> Website editor</Link><button className="admin-save" type="button" disabled={loading} onClick={() => void loadHealth()}><RefreshCw className={loading ? "spin" : ""} size={16} /> Refresh</button></div></header>
+      <header className="admin-header"><div><Link className="admin-brand" href="/admin"><span>washd. payments</span></Link></div><div><Link className="admin-preview" href="/admin"><ArrowLeft size={15} /> Website editor</Link><button className="admin-save" type="button" disabled={loading} onClick={() => void loadHealth()}><RefreshCw className={loading ? "spin" : ""} size={16} /> Refresh</button></div></header>
       <div className="payment-health-page">
         <div className="payment-health-title"><span className="kicker">Launch operations</span><h1>Payment health</h1><p>Member billing state and Stripe webhook processing in one place.</p></div>
         {error && <div className="admin-notice error"><ShieldAlert size={18} /> {error}</div>}

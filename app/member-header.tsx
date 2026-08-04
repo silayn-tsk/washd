@@ -1,6 +1,5 @@
 "use client";
 
-import { WashingMachine } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "./auth-provider";
 
@@ -10,7 +9,6 @@ export function MemberHeader() {
   return (
     <header className="member-header">
       <Link className="brand" href="/" aria-label="Washd home">
-        <span className="brand-mark"><WashingMachine size={22} strokeWidth={1.8} /></span>
         <span>washd<span className="brand-dot">.</span></span>
       </Link>
       <nav aria-label="Member navigation">

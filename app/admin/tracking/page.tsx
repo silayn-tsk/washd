@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowLeft, CheckCircle2, Clock3, LoaderCircle, PackageCheck, Save, ShieldAlert, WashingMachine } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Clock3, LoaderCircle, PackageCheck, Save, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "../../auth-provider";
 import { supabase } from "@/lib/supabase";
@@ -92,7 +92,7 @@ export default function AdminTrackingPage() {
 
   return (
     <main className="admin-page tracking-admin-page">
-      <header className="admin-header"><div><Link className="admin-brand" href="/admin"><WashingMachine size={22} /><span>Washd operations</span></Link></div><div><Link className="admin-preview" href="/admin"><ArrowLeft size={15} /> Website editor</Link><button className="admin-save" type="button" disabled={busy || !selectedMember} onClick={() => void saveTracking()}>{busy ? <><LoaderCircle className="spin" size={17} /> Updating…</> : <><Save size={17} /> Update live tracking</>}</button></div></header>
+      <header className="admin-header"><div><Link className="admin-brand" href="/admin"><span>washd. operations</span></Link></div><div><Link className="admin-preview" href="/admin"><ArrowLeft size={15} /> Website editor</Link><button className="admin-save" type="button" disabled={busy || !selectedMember} onClick={() => void saveTracking()}>{busy ? <><LoaderCircle className="spin" size={17} /> Updating…</> : <><Save size={17} /> Update live tracking</>}</button></div></header>
       <div className="tracking-admin-layout">
         <aside className="member-operations-list"><span>Members</span>{members.map((member) => <button className={selectedId === member.id ? "active" : ""} type="button" key={member.id} onClick={() => { setSelectedId(member.id); setNotice(""); setError(""); }}><strong>{member.member_id}</strong><span>{member.name || member.email}</span></button>)}</aside>
         <section className="tracking-admin-editor">

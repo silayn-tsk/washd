@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowLeft, CheckCircle2, Inbox, LoaderCircle, Mail, MessageSquareText, Phone, ShieldAlert, WashingMachine } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Inbox, LoaderCircle, Mail, MessageSquareText, Phone, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "../../auth-provider";
 import { supabase } from "@/lib/supabase";
@@ -89,7 +89,7 @@ export default function AdminEnquiriesPage() {
   return (
     <main className="admin-page enquiries-admin-page">
       <header className="admin-header">
-        <div><Link className="admin-brand" href="/admin"><WashingMachine size={22} /><span>Washd enquiries</span></Link></div>
+        <div><Link className="admin-brand" href="/admin"><span>washd. enquiries</span></Link></div>
         <div><Link className="admin-preview" href="/admin"><ArrowLeft size={15} /> Website editor</Link><Link className="admin-preview" href="/admin/tracking">Member tracking</Link></div>
       </header>
       <div className="enquiry-admin-layout">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { ArrowRight, Check, Eye, EyeOff, WashingMachine } from "lucide-react";
+import { ArrowRight, Check, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { TurnstileWidget, turnstileSiteKey } from "../turnstile-widget";
@@ -52,7 +52,7 @@ export default function SignupPage() {
 
   return (
     <main className="signup-page">
-      <Link className="brand signup-brand" href="/"><span className="brand-mark"><WashingMachine size={22} /></span><span>washd<span className="brand-dot">.</span></span></Link>
+      <Link className="brand signup-brand" href="/"><span>washd<span className="brand-dot">.</span></span></Link>
       <section className="signup-card">
         <div className="signup-intro">
           <span className="kicker">Join Washd</span>

@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { ArrowLeft, CheckCircle2, KeyRound, LoaderCircle, LockKeyhole, ShieldAlert, ShieldCheck, Smartphone, WashingMachine } from "lucide-react";
+import { ArrowLeft, CheckCircle2, KeyRound, LoaderCircle, LockKeyhole, ShieldAlert, ShieldCheck, Smartphone } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "../../auth-provider";
 import { supabase } from "@/lib/supabase";
@@ -115,7 +115,7 @@ export default function AdminSecurityPage() {
   const needsChallenge = verifiedFactors > 0 && currentLevel !== "aal2";
   return (
     <main className="admin-page security-admin-page">
-      <header className="admin-header"><div><Link className="admin-brand" href="/admin"><WashingMachine size={22} /><span>Washd security</span></Link><span className="admin-secure"><LockKeyhole size={13} /> Owner only</span></div><div><Link className="admin-preview" href="/admin"><ArrowLeft size={15} /> Website editor</Link></div></header>
+      <header className="admin-header"><div><Link className="admin-brand" href="/admin"><span>washd. security</span></Link><span className="admin-secure"><LockKeyhole size={13} /> Owner only</span></div><div><Link className="admin-preview" href="/admin"><ArrowLeft size={15} /> Website editor</Link></div></header>
       <section className="security-admin-content">
         <div className="payment-health-title"><span className="kicker">Account protection</span><h1>Admin multi-factor authentication</h1><p>Protect website content, customer tracking, enquiries and payment operations with an authenticator app.</p></div>
         {notice && <div className="admin-notice success"><CheckCircle2 size={18} /> {notice}</div>}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, Eye, EyeOff, LockKeyhole, WashingMachine } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, LockKeyhole } from "lucide-react";
 import Link from "next/link";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 
@@ -31,7 +31,7 @@ export default function ResetPasswordPage() {
   return (
     <main className="auth-page">
       <section className="auth-story">
-        <Link className="brand auth-brand" href="/"><span className="brand-mark"><WashingMachine size={22} /></span><span>washd<span className="brand-dot">.</span></span></Link>
+        <Link className="brand auth-brand" href="/"><span>washd<span className="brand-dot">.</span></span></Link>
         <div className="auth-story-copy">
           <span className="kicker light">Account security</span>
           <h1>A fresh start,<br /><em>securely handled.</em></h1>

@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { ArrowRight, KeyRound, LoaderCircle, LockKeyhole, ShieldCheck, WashingMachine } from "lucide-react";
+import { ArrowRight, KeyRound, LoaderCircle, LockKeyhole, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "../auth-provider";
 import { supabase } from "@/lib/supabase";
@@ -59,7 +59,7 @@ export default function MfaPage() {
   return (
     <main className="mfa-page">
       <section className="mfa-card">
-        <Link className="brand" href="/"><span className="brand-mark"><WashingMachine size={21} /></span><span>washd<span className="brand-dot">.</span></span></Link>
+        <Link className="brand" href="/"><span>washd<span className="brand-dot">.</span></span></Link>
         <span className="mfa-icon"><ShieldCheck size={28} /></span>
         <span className="kicker">Protected access</span>
         <h1>Enter your authenticator code.</h1>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeft, CheckCircle2, ExternalLink, LoaderCircle, LockKeyhole, LogOut, Save, ShieldAlert, WashingMachine } from "lucide-react";
+import { ArrowLeft, CheckCircle2, ExternalLink, LoaderCircle, LockKeyhole, LogOut, Save, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "../auth-provider";
 import { defaultAddons, defaultPlans, defaultSiteContent, mergeSiteContent, type Plan, type PlanAddon, type SiteContent } from "@/lib/site-content";
@@ -152,7 +152,7 @@ export default function AdminPage() {
   return (
     <main className="admin-page">
       <header className="admin-header">
-        <div><Link className="admin-brand" href="/"><WashingMachine size={22} /><span>Washd admin</span></Link><span className="admin-secure"><LockKeyhole size={13} /> Owner only</span></div>
+        <div><Link className="admin-brand" href="/"><span>washd. admin</span></Link><span className="admin-secure"><LockKeyhole size={13} /> Owner only</span></div>
         <div><a className="admin-preview" href="/" target="_blank">View website <ExternalLink size={15} /></a><button className="admin-save" type="button" disabled={saving} onClick={() => void saveEverything()}>{saving ? <><LoaderCircle className="spin" size={17} /> Saving…</> : <><Save size={17} /> Save all changes</>}</button></div>
       </header>
 

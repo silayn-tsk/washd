@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { ArrowRight, Eye, EyeOff, LockKeyhole, MapPin, WashingMachine } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, LockKeyhole, MapPin } from "lucide-react";
 import Link from "next/link";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { TurnstileWidget, turnstileSiteKey } from "../turnstile-widget";
@@ -94,7 +94,7 @@ export default function LoginPage() {
     <main className="auth-page">
       <section className="auth-story">
         <Link className="brand auth-brand" href="/">
-          <span className="brand-mark"><WashingMachine size={22} /></span><span>washd<span className="brand-dot">.</span></span>
+          <span>washd<span className="brand-dot">.</span></span>
         </Link>
         <div className="auth-story-copy">
           <span className="kicker light">Your laundry, in view</span>
@@ -110,7 +110,7 @@ export default function LoginPage() {
 
       <section className="auth-form-side">
         <div className="auth-form-card">
-          <span className="auth-mobile-logo"><WashingMachine size={20} /></span>
+          <span className="auth-mobile-logo">washd<span className="brand-dot">.</span></span>
           <span className="kicker">Member access</span>
           <h2>Welcome back.</h2>
           <p>Schedule collections and track each bag from lobby to wardrobe.</p>
