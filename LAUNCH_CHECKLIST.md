@@ -2,6 +2,8 @@
 
 This is the production go/no-go list. A box should only be checked after it is verified on the live domain.
 
+Owner decisions and secure setup handoffs are condensed in `OWNER_LAUNCH_ACTIONS.md`.
+
 ## Day 1 — Security and readiness audit
 
 - [x] Confirm Supabase Row Level Security is enabled for member, content, enquiry and operations data.
