@@ -1,6 +1,7 @@
 "use client";
 
 import { WashingMachine } from "lucide-react";
+import Link from "next/link";
 import { useAuth } from "./auth-provider";
 
 export function MemberHeader() {
@@ -8,17 +9,18 @@ export function MemberHeader() {
 
   return (
     <header className="member-header">
-      <a className="brand" href="/" aria-label="Washd home">
+      <Link className="brand" href="/" aria-label="Washd home">
         <span className="brand-mark"><WashingMachine size={22} strokeWidth={1.8} /></span>
-        <span>Washd</span>
-      </a>
+        <span>washd<span className="brand-dot">.</span></span>
+      </Link>
       <nav aria-label="Member navigation">
-        <a href="/">Home</a>
-        <a href="/plans">Plans</a>
+        <Link className="member-home-link" href="/">Home</Link>
+        {user && <Link className="member-dashboard-link" href="/account">Dashboard</Link>}
+        <Link href="/plans">Plans</Link>
         {!loading && (
-          <a className="member-pill" href={user ? "/account" : "/login"}>
-            {user ? "My account" : "Log in"}
-          </a>
+          <Link className="member-pill" href={user ? "/account" : "/login"}>
+            {user ? "My profile" : "Log in"}
+          </Link>
         )}
       </nav>
     </header>

@@ -14,50 +14,75 @@ async function render(path = "/") {
   );
 }
 
-test("server-renders the complete Washd landing page", async () => {
+test("server-renders the complete Washd fixed-route website", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
-  assert.match(html, /<title>Washd — Laundry, seamlessly handled<\/title>/i);
-  assert.match(html, /Laundry,/);
-  assert.match(html, /seamlessly/);
-  assert.match(html, /Schedule a pickup/);
-  assert.match(html, /Simple, honest pricing/);
-  assert.match(html, /Washd for business/);
+  assert.match(html, /<title>Washd — Laundry, handled\.<\/title>/i);
+  assert.match(html, /The milkman model for laundry/i);
+  assert.match(html, /Drop Mon/);
+  assert.match(html, /Three simple steps/);
+  assert.match(html, /Two services, combined however you like/);
+  assert.match(html, /Simple monthly plans/);
+  assert.match(html, /Laundry expertise since 1964/);
+  assert.match(html, /Everything before your first drop/);
+  assert.match(html, /build your Washd plan/i);
   assert.match(html, /https?:\/\/[^"']+\/og\.png/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape|react-loading-skeleton/i);
 });
 
-test("renders the Firebase login, sign-up, plans and protected account entry", async () => {
+test("renders Supabase member pages and the protected admin editor", async () => {
   const pages = await Promise.all([
     render("/login").then((response) => response.text()),
     render("/signup").then((response) => response.text()),
     render("/plans").then((response) => response.text()),
     render("/account").then((response) => response.text()),
+    render("/admin").then((response) => response.text()),
+    render("/admin/enquiries").then((response) => response.text()),
+    render("/privacy").then((response) => response.text()),
+    render("/privacy/bm").then((response) => response.text()),
+    render("/terms").then((response) => response.text()),
+    render("/care-guarantee").then((response) => response.text()),
+    render("/admin/payments").then((response) => response.text()),
+    render("/mfa").then((response) => response.text()),
+    render("/admin/security").then((response) => response.text()),
   ]);
 
   assert.match(pages[0], /Welcome back/);
-  assert.match(pages[0], /Use demo account/);
+  assert.match(pages[0], /Secure encrypted member access/);
+  assert.doesNotMatch(pages[0], /Protected by Supabase|Supabase protected|managed by Supabase/i);
   assert.match(pages[1], /Create account/);
   assert.match(pages[1], /Secure Stripe-hosted payments/);
-  assert.match(pages[2], /Stripe’s secure checkout/);
+  assert.match(pages[2], /Choose your monthly/);
   assert.match(pages[2], /Professional/);
-  assert.match(pages[3], /Loading your account/);
+  assert.match(pages[3], /Loading your Washd dashboard/);
+  assert.match(pages[4], /Opening the Washd editor/);
+  assert.match(pages[5], /Opening enquiry inbox/);
+  assert.match(pages[6], /Privacy Notice/);
+  assert.match(pages[7], /Notis Privasi/);
+  assert.match(pages[8], /Service Terms/);
+  assert.match(pages[9], /Washd Care Guarantee/);
+  assert.match(pages[10], /Checking payment health/);
+  assert.match(pages[11], /Checking account security/);
+  assert.match(pages[12], /Opening admin security/);
 });
 
 test("keeps the product implementation free of starter preview code", async () => {
-  const [page, layout, packageJson] = await Promise.all([
+  const [page, layout, siteUrl, packageJson] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../lib/site-url.ts", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
   ]);
 
   assert.match(page, /IntersectionObserver/);
-  assert.match(page, /prefers-reduced-motion|bookingOpen|estimate/);
-  assert.match(layout, /metadataBase: new URL\("https:\/\/washd-my-86c6d\.web\.app"\)/);
+  assert.match(page, /Message us on WhatsApp|whatsappUrl/);
+  assert.match(layout, /metadataBase: new URL\(siteUrl\)/);
+  assert.match(siteUrl, /NEXT_PUBLIC_SITE_URL/);
+  assert.match(siteUrl, /https:\/\/washd-my-86c6d\.web\.app/);
   assert.match(packageJson, /"name": "washd-laundry"/);
-  assert.doesNotMatch(page + layout + packageJson, /SkeletonPreview|codex-preview|react-loading-skeleton/);
+  assert.doesNotMatch(page + layout + siteUrl + packageJson, /SkeletonPreview|codex-preview|react-loading-skeleton/);
   await assert.rejects(access(new URL("../app/_sites-preview/SkeletonPreview.tsx", import.meta.url)));
 });

@@ -1,19 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import {
-  browserLocalPersistence,
-  sendPasswordResetEmail,
-  setPersistence,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { useCallback, useEffect, useState } from "react";
 import { ArrowRight, Eye, EyeOff, LockKeyhole, MapPin, WashingMachine } from "lucide-react";
-import { auth } from "@/lib/firebase";
+import Link from "next/link";
+import { isSupabaseConfigured, supabase } from "@/lib/supabase";
+import { TurnstileWidget, turnstileSiteKey } from "../turnstile-widget";
 
-function friendlyError(code?: string) {
-  if (code === "auth/invalid-credential" || code === "auth/wrong-password" || code === "auth/user-not-found") return "That email or password doesn’t match our records.";
-  if (code === "auth/too-many-requests") return "Too many attempts. Please wait a moment and try again.";
-  if (code === "auth/invalid-email") return "Enter a valid email address.";
+function friendlyError(message?: string) {
+  const normalized = message?.toLowerCase() ?? "";
+  if (normalized.includes("invalid login credentials")) return "That email or password doesn’t match our records.";
+  if (normalized.includes("rate limit")) return "Too many attempts. Please wait a moment and try again.";
+  if (normalized.includes("email")) return "Enter a valid email address.";
   return "We couldn’t log you in. Please try again.";
 }
 
@@ -30,19 +27,41 @@ export default function LoginPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaReset, setCaptchaReset] = useState(0);
+  const handleCaptcha = useCallback((token: string) => setCaptchaToken(token), []);
+
+  useEffect(() => {
+    const signup = new URLSearchParams(window.location.search).get("signup");
+    if (signup === "check-email") queueMicrotask(() => setNotice("Check your inbox to confirm your Washd account, then log in."));
+  }, []);
 
   async function logIn(loginEmail = email, loginPassword = password) {
     setBusy(true);
     setError("");
     setNotice("");
     try {
-      await setPersistence(auth, browserLocalPersistence);
-      await signInWithEmailAndPassword(auth, loginEmail.trim(), loginPassword);
-      window.location.assign(safeNextPath());
+      if (!isSupabaseConfigured) throw new Error("Supabase is not configured");
+      if (turnstileSiteKey && !captchaToken) throw new Error("CAPTCHA_REQUIRED");
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email: loginEmail.trim(),
+        password: loginPassword,
+        options: { captchaToken: captchaToken || undefined },
+      });
+      if (authError) throw authError;
+      const destination = safeNextPath();
+      const { data: assurance } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      if (assurance?.currentLevel !== "aal2" && assurance?.nextLevel === "aal2") {
+        window.location.assign(`/mfa?next=${encodeURIComponent(destination)}`);
+      } else {
+        window.location.assign(destination);
+      }
     } catch (caught) {
-      setError(friendlyError((caught as { code?: string }).code));
+      const message = (caught as { message?: string }).message;
+      setError(message?.includes("CAPTCHA_REQUIRED") ? "Complete the security check before logging in." : message?.includes("not configured") ? "Washd account access is being connected. Please try again shortly." : friendlyError(message));
     } finally {
       setBusy(false);
+      if (turnstileSiteKey) setCaptchaReset((value) => value + 1);
     }
   }
 
@@ -54,21 +73,29 @@ export default function LoginPage() {
     setBusy(true);
     setError("");
     try {
-      await sendPasswordResetEmail(auth, email.trim());
+      if (!isSupabaseConfigured) throw new Error("Supabase is not configured");
+      if (turnstileSiteKey && !captchaToken) throw new Error("CAPTCHA_REQUIRED");
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${window.location.origin}/reset-password`,
+        captchaToken: captchaToken || undefined,
+      });
+      if (resetError) throw resetError;
       setNotice(`Password reset instructions were sent to ${email.trim()}.`);
     } catch (caught) {
-      setError(friendlyError((caught as { code?: string }).code));
+      const message = (caught as { message?: string }).message;
+      setError(message?.includes("CAPTCHA_REQUIRED") ? "Complete the security check before requesting a password reset." : message?.includes("not configured") ? "Washd account access is being connected. Please try again shortly." : friendlyError(message));
     } finally {
       setBusy(false);
+      if (turnstileSiteKey) setCaptchaReset((value) => value + 1);
     }
   }
 
   return (
     <main className="auth-page">
       <section className="auth-story">
-        <a className="brand auth-brand" href="/">
-          <span className="brand-mark"><WashingMachine size={22} /></span><span>Washd</span>
-        </a>
+        <Link className="brand auth-brand" href="/">
+          <span className="brand-mark"><WashingMachine size={22} /></span><span>washd<span className="brand-dot">.</span></span>
+        </Link>
         <div className="auth-story-copy">
           <span className="kicker light">Your laundry, in view</span>
           <h1>From lobby<br />to <em>wardrobe.</em></h1>
@@ -92,18 +119,18 @@ export default function LoginPage() {
             <label>Email<input required type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" /></label>
             <label>Password
               <span className="password-field">
-                <input required minLength={6} type={showPassword ? "text" : "password"} autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="At least 6 characters" />
+                <input required minLength={6} type={showPassword ? "text" : "password"} autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Your password" />
                 <button type="button" aria-label={showPassword ? "Hide password" : "Show password"} onClick={() => setShowPassword((value) => !value)}>{showPassword ? <EyeOff size={19} /> : <Eye size={19} />}</button>
               </span>
             </label>
+            <TurnstileWidget action="member_login" onToken={handleCaptcha} resetSignal={captchaReset} />
             {error && <div className="form-alert error" role="alert">{error}</div>}
             {notice && <div className="form-alert success" role="status">{notice}</div>}
             <button className="button wide gold-button" type="submit" disabled={busy}>{busy ? "Logging in…" : <>Log in <ArrowRight size={18} /></>}</button>
           </form>
 
-          <button className="demo-button" type="button" disabled={busy} onClick={() => void logIn("pravena@residence.my", "freshcycle123")}><MapPin size={16} /> Use demo account</button>
           <div className="auth-links"><a href="/signup">Create an account</a><button type="button" onClick={() => void resetPassword()}>Reset password</button></div>
-          <small className="secure-note"><LockKeyhole size={13} /> Protected by Firebase Authentication</small>
+          <small className="secure-note"><LockKeyhole size={13} /> Secure encrypted member access</small>
         </div>
       </section>
     </main>
