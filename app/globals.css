@@ -968,11 +968,11 @@ h1 em, h2 em { color: #4f83ed; font-weight: 390; }
 .final-steps svg { padding: 3px; border-radius: 50%; color: #06232A; background: #C9A86A; }
 .final-orbit { position: absolute; width: 560px; height: 560px; right: -220px; bottom: -270px; border: 1px solid rgba(29,151,168,.35); border-radius: 50%; box-shadow: 0 0 0 70px rgba(29,151,168,.1),0 0 0 140px rgba(255,255,255,.025); }
 .deck-footer { padding: 70px clamp(28px,7vw,112px) 30px; color: white; background: #06232A; display: grid; grid-template-columns: 1.6fr repeat(3,1fr); gap: 45px; }
-.deck-brand.footer { color: white; }
+.deck-footer-brand { align-self: flex-start; min-height: 0 !important; padding: 0; color: white; background: transparent; }
 .deck-footer > div { display: flex; flex-direction: column; align-items: flex-start; gap: 11px; }
 .deck-footer p, .deck-footer a, .deck-footer span { color: rgba(255,255,255,.55); font-size: 12px; line-height: 1.6; }
-.deck-brand.footer .deck-wordmark { color: #C9A86A; font-size: clamp(34px,3vw,44px); line-height: 1; }
-.deck-brand.footer .deck-wordmark i { color: white; }
+.deck-footer-brand .deck-wordmark { color: #C9A86A; font-size: clamp(34px,3vw,44px); line-height: 1; }
+.deck-footer-brand .deck-wordmark i { color: white; }
 .deck-footer a { min-height: 24px; display: inline-flex; align-items: center; }
 .deck-footer strong { color: #C9A86A; font-size: 10px; letter-spacing: .15em; text-transform: uppercase; margin-bottom: 6px; }
 .deck-footer > small { grid-column: 1/-1; padding-top: 25px; border-top: 1px solid rgba(255,255,255,.1); color: rgba(255,255,255,.65); }

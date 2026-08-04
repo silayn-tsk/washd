@@ -274,7 +274,7 @@ export default function Home() {
       </section>
 
       <footer className="deck-footer">
-        <div><a className="deck-brand footer" href="#top"><span className="deck-wordmark">washd<i>.</i></span></a><p>{content.brand.tagline}<br />While you live your life.</p></div>
+        <div><a className="deck-brand deck-footer-brand" href="#top"><span className="deck-wordmark">washd<i>.</i></span></a><p>{content.brand.tagline}<br />While you live your life.</p></div>
         <div><strong>Explore</strong><a href="#how">How it works</a><a href="#services">Services</a><a href="/plans">Membership plans</a></div>
         <div><strong>Contact</strong><a href={joinUrl} target="_blank" rel="noreferrer">{content.contact.phoneDisplay}</a><a href={`mailto:${content.contact.email}`}>{content.contact.email}</a><span>{content.contact.serviceArea}</span></div>
         <div><strong>Members & policies</strong><a href="/login">Log in</a><a href="/account">My account</a><a href="/privacy">Privacy notice</a><a href="/terms">Service terms</a><a href="/service-information">Service information</a><a href="/care-guarantee">Care guarantee</a></div>
