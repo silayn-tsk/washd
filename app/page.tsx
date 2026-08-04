@@ -10,6 +10,7 @@ import {
   ChevronDown,
   Clock3,
   HeartHandshake,
+  MessageCircle,
   Menu,
   PackageCheck,
   RotateCcw,
@@ -115,10 +116,6 @@ export default function Home() {
           <div className="deck-actions">
             <a className="deck-button gold" href={joinUrl} target="_blank" rel="noreferrer">{content.hero.primaryCta} <ArrowRight size={18} /></a>
             <a className="deck-text-link" href="#plans">{content.hero.secondaryCta} <span>↓</span></a>
-          </div>
-          <div className="deck-route-pills">
-            <span>{content.schedule.firstRoute}</span>
-            <span>{content.schedule.secondRoute}</span>
           </div>
         </div>
 
@@ -284,6 +281,17 @@ export default function Home() {
         <div><strong>Members & policies</strong><a href="/login">Log in</a><a href="/account">My account</a><a href="/privacy">Privacy notice</a><a href="/terms">Service terms</a><a href="/service-information">Service information</a><a href="/maklumat-perkhidmatan">Maklumat perkhidmatan</a><a href="/care-guarantee">Care guarantee</a></div>
         <small>© 2026 Washd. {content.brand.tagline}{content.contact.legalName && <> · {content.contact.legalName}{content.contact.registrationNumber && ` (${content.contact.registrationNumber})`}</>}</small>
       </footer>
+
+      <a
+        className={menuOpen ? "floating-whatsapp hidden" : "floating-whatsapp"}
+        href={joinUrl}
+        target="_blank"
+        rel="noreferrer"
+        aria-label="Chat with Washd on WhatsApp"
+      >
+        <MessageCircle size={21} aria-hidden="true" />
+        <span>WhatsApp</span>
+      </a>
     </main>
   );
 }
