@@ -71,6 +71,7 @@ npm run launch:check
 - `npm run backup:production:dry-run` validates the recovery-snapshot procedure.
 - `npm run auth:emails:check` validates staged Auth templates without changing hosted settings.
 - `/admin/security` lets the owner enroll an authenticator and replace the shared password. Admin database policies and sensitive functions require MFA after enrollment.
+- `/admin/payments` checks Stripe mode, charge/payout capability, every active MYR price, webhook coverage and the billing portal without exposing payment credentials or account identifiers.
 
 ## Public deployment
 

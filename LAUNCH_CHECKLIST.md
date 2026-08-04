@@ -25,6 +25,8 @@ Owner decisions and secure setup handoffs are condensed in `OWNER_LAUNCH_ACTIONS
 - [ ] Make one low-value real payment, verify the subscription in Stripe and Supabase, then refund it.
 - [ ] Verify duplicate, delayed and out-of-order webhook events are safe.
 - [x] Deploy webhook event claiming, retry status, and stale-event protection in the test environment.
+- [x] Deploy an owner-only Stripe environment audit covering account activation, payout capability, MYR recurring prices, webhook events and customer portal configuration.
+- [x] Make checkout recover safely when a stored test-mode customer reference is not present in the active Stripe environment.
 
 ## Day 3 — Customer operations
 
@@ -109,3 +111,4 @@ Owner decisions and secure setup handoffs are condensed in `OWNER_LAUNCH_ACTIONS
 - Hosted Auth now permits redirects only to the production Firebase origin; localhost recovery redirects were removed.
 - Branded Auth templates are staged, but Supabase requires custom SMTP before free-tier template changes can be applied.
 - `PRELAUNCH_DATA_AUDIT.md` records the exact test-data cleanup proposal. The owner/member separation fix is deployed so the admin account will not consume a future customer ID.
+- `/admin/payments` now verifies Stripe mode, account capability, all active prices, the signed webhook and customer portal directly against Stripe without exposing identifiers or keys.

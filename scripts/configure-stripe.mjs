@@ -82,9 +82,6 @@ for (const plan of plans) {
   });
 }
 
-const { error: planError } = await supabase.from("plans").upsert(configuredPlans, { onConflict: "id" });
-if (planError) throw planError;
-
 const configuredAddons = [];
 for (const [index, addon] of addons.entries()) {
   let product = products.data.find((candidate) => candidate.metadata.washd_addon_id === addon.id);
@@ -117,9 +114,6 @@ for (const [index, addon] of addons.entries()) {
     updated_at: new Date().toISOString(),
   });
 }
-
-const { error: addonError } = await supabase.from("plan_addons").upsert(configuredAddons, { onConflict: "id" });
-if (addonError) throw addonError;
 
 const portalConfigurations = await stripe.billingPortal.configurations.list({ active: true, limit: 100 });
 let portal = portalConfigurations.data.find((configuration) => configuration.metadata?.washd_app === "true");
@@ -170,11 +164,18 @@ if (!webhookSecret) {
 }
 
 await writeFile(outputPath, JSON.stringify({
+  mode: stripeSecretKey.startsWith("sk_live_") ? "live" : "test",
   stripeWebhookSecret: webhookSecret,
   stripePortalConfigurationId: portal.id,
   webhookEndpointId: endpoint.id,
   plans: Object.fromEntries(configuredPlans.map((plan) => [plan.id, plan.stripe_price_id])),
   addons: Object.fromEntries(configuredAddons.map((addon) => [addon.id, addon.stripe_price_id])),
 }, null, 2), { mode: 0o600 });
+
+const { error: planError } = await supabase.from("plans").upsert(configuredPlans, { onConflict: "id" });
+if (planError) throw planError;
+
+const { error: addonError } = await supabase.from("plan_addons").upsert(configuredAddons, { onConflict: "id" });
+if (addonError) throw addonError;
 
 console.log(`Configured four Stripe ${stripeSecretKey.startsWith("sk_live_") ? "live" : "test"} subscriptions, four add-ons, the billing portal, and the signed Washd webhook.`);

@@ -1,6 +1,10 @@
 import { corsHeaders, json, safeReturnUrl } from "../_shared/http.ts";
 import { adminClient, requireUser, stripeClient } from "../_shared/services.ts";
 
+function isMissingStripeResource(error: unknown) {
+  return Boolean(error && typeof error === "object" && "code" in error && error.code === "resource_missing");
+}
+
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") return new Response("ok", { headers: corsHeaders(request) });
   if (request.method !== "POST") return json(request, { error: "Method not allowed" }, 405);
@@ -45,6 +49,15 @@ Deno.serve(async (request) => {
 
     const stripe = stripeClient();
     let customerId = profile?.stripe_customer_id || null;
+    if (customerId) {
+      try {
+        const existingCustomer = await stripe.customers.retrieve(customerId);
+        if (existingCustomer.deleted) customerId = null;
+      } catch (error) {
+        if (isMissingStripeResource(error)) customerId = null;
+        else throw error;
+      }
+    }
     if (!customerId) {
       const customer = await stripe.customers.create({
         email: user.email,

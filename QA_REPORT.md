@@ -18,6 +18,7 @@ The current Firebase release is visually stable on desktop and mobile Chrome, ha
 - Login and signup layouts at mobile width.
 - Authenticated member dashboard and tracking presentation.
 - Owner-only payments and enquiries admin screens.
+- Owner-only Stripe environment readiness audit; unauthenticated invocation is rejected by the hosted function gateway.
 - Fifteen public/member/admin/metadata routes return HTTP 200.
 - The expanded release now exposes seventeen verified routes, including `/mfa` and `/admin/security`.
 - Thirty-five internal link references resolve to valid exported routes.
@@ -59,6 +60,8 @@ Build verification:
 - Replaced page `no-store` caching with revalidation while preserving immutable static assets.
 - Inlined the release CSS to remove the render-blocking stylesheet request.
 - Added enforceable owner MFA, CSP/HSTS headers and configurable production-domain metadata.
+- Added direct test/live Stripe mode, payout, price, webhook and portal verification to payment operations.
+- Added safe recovery from stale cross-mode Stripe customer references during checkout.
 
 ## Still required before go-live approval
 
