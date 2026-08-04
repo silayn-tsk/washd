@@ -62,6 +62,8 @@ This is the production go/no-go list. A box should only be checked after it is v
 ## Day 6 — Launch rehearsal
 
 - [ ] Remove demo users, test subscriptions and misleading sample data from production.
+- [x] Commit the verified launch candidate after checking tracked filenames and pending content for common private-key and payment-secret patterns.
+- [ ] Push/copy the launch branch to an owner-controlled off-device source repository.
 - [ ] Export/record the current Supabase schema, secrets list and Stripe configuration.
 - [x] Add a permission-restricted, git-ignored production recovery-snapshot command and document the restore procedure.
 - [ ] Confirm database backup/recovery capability and Firebase rollback steps.
@@ -85,6 +87,7 @@ This is the production go/no-go list. A box should only be checked after it is v
 6. Supabase currently reports no stored backups and point-in-time recovery is disabled; a production backup plan is required.
 7. Launch-day operating roles and collection-venue contacts still need named owners.
 8. Cloudflare Turnstile keys have not been created or enabled in Supabase yet; the frontend integration is staged but intentionally dormant.
+9. The launch source is committed locally, but the legacy source remote is inaccessible; create an owner-controlled off-device copy before launch.
 
 ## Latest QA baseline — 4 August 2026
 
