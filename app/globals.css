@@ -406,6 +406,24 @@ h1 em, h2 em { color: #4f83ed; font-weight: 390; }
 .signup-intro li svg { color: #6c9564; }
 .form-foot { text-align: center; color: #71858a; font-size: 11px; }
 .form-foot a { color: var(--ink); font-weight: 700; }
+.terms-modal-backdrop { position: fixed; z-index: 100; inset: 0; padding: 24px; display: grid; place-items: center; background: rgba(4,27,32,.68); backdrop-filter: blur(8px); }
+.terms-modal { width: min(760px,100%); max-height: min(820px,calc(100vh - 48px)); padding: clamp(22px,4vw,38px); border: 1px solid rgba(255,255,255,.58); border-radius: 24px; color: #173941; background: #fbfcf9; box-shadow: 0 35px 100px rgba(0,0,0,.3); display: flex; flex-direction: column; animation: terms-modal-in .28s ease both; }
+@keyframes terms-modal-in { from { opacity: 0; transform: translateY(16px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.terms-modal header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid #dce4e1; }
+.terms-modal .kicker { display: inline-flex; align-items: center; gap: 7px; }
+.terms-modal h2 { margin: 12px 0 8px; font: 600 clamp(31px,5vw,47px)/1 var(--font-montserrat), Arial, sans-serif; letter-spacing: -.045em; }
+.terms-modal header p { margin: 0; color: #71858a; font-size: 12px; }
+.terms-modal-close { width: 38px; height: 38px; flex: 0 0 auto; border: 1px solid #d8e1de; border-radius: 50%; color: #496269; background: white; display: grid; place-items: center; cursor: pointer; }
+.terms-modal-copy { overflow-y: auto; margin: 22px -10px 0 0; padding: 0 18px 0 0; display: grid; gap: 20px; scrollbar-color: #b3c6c2 transparent; }
+.terms-modal-copy section { padding-bottom: 20px; border-bottom: 1px solid #e4e9e7; }
+.terms-modal-copy section:last-child { border-bottom: 0; }
+.terms-modal-copy h3 { margin: 0 0 8px; font: 650 14px/1.35 var(--font-montserrat), Arial, sans-serif; }
+.terms-modal-copy p { margin: 0; white-space: pre-line; color: #5a6e72; font-size: 12px; line-height: 1.65; }
+.terms-modal-acceptance { margin-top: 20px; padding: 15px; border-radius: 13px; background: #eef4f3; display: grid !important; grid-template-columns: auto 1fr; gap: 11px !important; align-items: start; color: #294b52; font-size: 12px !important; line-height: 1.5; cursor: pointer; }
+.terms-modal-acceptance input { width: 18px !important; height: 18px; margin: 0; accent-color: #1a7a8c; }
+.terms-modal footer { padding-top: 17px; display: flex; align-items: center; justify-content: flex-end; gap: 16px; }
+.terms-modal footer .text-button { padding: 11px 8px; border: 0; color: #53696d; background: transparent; cursor: pointer; font-weight: 700; }
+.terms-modal footer .button { margin: 0; }
 .secure-note a { color: #176d7b; text-decoration: underline; text-underline-offset: 2px; }
 .enquiry-privacy { display: block; color: rgba(255,255,255,.48); line-height: 1.6; }
 .enquiry-privacy a { color: rgba(255,255,255,.82); text-decoration: underline; text-underline-offset: 2px; }
@@ -476,6 +494,10 @@ h1 em, h2 em { color: #4f83ed; font-weight: 390; }
   .signup-page { padding: 25px 18px 50px; }
   .signup-card { grid-template-columns: 1fr; gap: 30px; padding: 28px 22px; }
   .signup-intro h1 { font-size: 47px; }
+  .terms-modal-backdrop { padding: 12px; }
+  .terms-modal { max-height: calc(100vh - 24px); padding: 23px 20px; border-radius: 19px; }
+  .terms-modal footer { gap: 10px; }
+  .terms-modal footer .button { padding: 12px 14px; font-size: 11px; }
   .membership-grid, .account-grid { grid-template-columns: 1fr; }
   .plans-hero { padding-top: 65px; }
   .plans-hero h1 { font-size: 58px; }
