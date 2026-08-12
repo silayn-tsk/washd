@@ -71,7 +71,7 @@ export default function SignupPage() {
   return <main className="signup-page">
     <Link className="brand signup-brand" href="/"><span>washd<span className="brand-dot">.</span></span></Link>
     <section className="signup-card">
-      <div className="signup-intro"><span className="signup-glow signup-glow-one" /><span className="signup-glow signup-glow-two" /><span className="kicker">Join Washd</span><h1>A fresher weekly rhythm starts here.</h1><p>Create your account now. You can choose a plan after signing up.</p><ul><li><Check size={16} /> Track every Washd bag</li><li><Check size={16} /> Manage pickups in one place</li><li><Check size={16} /> Secure Stripe-hosted payments</li></ul><div className="signup-machine-art" role="img" aria-label="A pristine washing machine with fresh bubbles" /></div>
+      <div className="signup-intro"><span className="signup-glow signup-glow-one" /><span className="signup-glow signup-glow-two" /><span className="kicker">Join Washd</span><h1>A fresher weekly rhythm starts here.</h1><p>Create your account now. You can choose a plan after signing up.</p><ul><li><Check size={16} /> Track every Washd bag</li><li><Check size={16} /> Manage pickups in one place</li><li><Check size={16} /> Secure Stripe-hosted payments</li></ul></div>
       <form onSubmit={reviewTerms}>
         <label>Full name<input required minLength={2} autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} placeholder="Your name" /></label>
         <label>Residence / unit<input autoComplete="street-address" value={unit} onChange={(event) => setUnit(event.target.value)} placeholder="e.g. The Residence · Unit 12-3" /></label>
