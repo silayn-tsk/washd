@@ -20,6 +20,8 @@ const sectionLabels: Record<string, string> = {
   routine: "How it works",
   services: "Services",
   membership: "Membership introduction",
+  planDetails: "Plan clauses & inclusions",
+  aLaCarte: "Per-piece & one-off services",
   customPlan: "Custom plan",
   safety: "Safety promise",
   benefits: "Member benefits",
@@ -111,7 +113,7 @@ export default function AdminPage() {
   const activeTitle = activePolicyKey
     ? policyLabels[activePolicyKey]
     : activeSection === "plans" ? "Membership plans"
-      : activeSection === "addons" ? "À-la-carte add-ons"
+      : activeSection === "addons" ? "Monthly Stripe add-ons"
         : sectionLabels[activeSection];
 
   useEffect(() => {
@@ -204,7 +206,7 @@ export default function AdminPage() {
           {(Object.keys(policyLabels) as Array<keyof typeof policyLabels>).map((key) => <button className={activeSection === `policy-${key}` ? "active" : ""} type="button" key={key} onClick={() => setActiveSection(`policy-${key}`)}><BookOpenText size={14} /> {policyLabels[key]}</button>)}
           <strong>Commerce</strong>
           <button className={activeSection === "plans" ? "active" : ""} type="button" onClick={() => setActiveSection("plans")}>Membership plans</button>
-          <button className={activeSection === "addons" ? "active" : ""} type="button" onClick={() => setActiveSection("addons")}>À-la-carte add-ons</button>
+          <button className={activeSection === "addons" ? "active" : ""} type="button" onClick={() => setActiveSection("addons")}>Monthly Stripe add-ons</button>
           <strong>Operations</strong>
           <Link className="admin-operation-link" href="/admin/tracking">Member tracking <span>↗</span></Link>
           <Link className="admin-operation-link" href="/admin/enquiries">Enquiry inbox <span>↗</span></Link>

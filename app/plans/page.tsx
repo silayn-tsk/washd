@@ -1,13 +1,42 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, CalendarDays, Check, LockKeyhole, PackageCheck, Shirt, SlidersHorizontal, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarDays, Check, CircleDollarSign, Clock3, Droplets, LockKeyhole, MessageCircle, PackageCheck, Shirt, SlidersHorizontal, Sparkles } from "lucide-react";
 import { useAuth } from "../auth-provider";
 import Link from "next/link";
 import { MemberHeader } from "../member-header";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { useSiteContent } from "../use-site-content";
-import type { Plan } from "@/lib/site-content";
+import type { Plan, SiteContent } from "@/lib/site-content";
+
+function WhatsAppRequest({ content, label = "Request on WhatsApp" }: { content: SiteContent; label?: string }) {
+  const message = encodeURIComponent("Hi Washd, I would like to arrange a per-piece or special-care laundry item for my next collection.");
+  return <a className="button" href={`https://wa.me/${content.contact.whatsappNumber}?text=${message}`} target="_blank" rel="noreferrer"><MessageCircle size={17} /> {label} <ArrowRight size={16} /></a>;
+}
+
+function PlanClauses({ detail }: { detail: SiteContent["planDetails"][string] | undefined }) {
+  if (!detail) return null;
+  return <section className="plan-clauses-section">
+    <div className="plan-clauses-heading"><span className="kicker">Plan details</span><h2>Clear before your first collection.</h2><p>Everything this membership includes, plus the important care conditions.</p></div>
+    <div className="plan-clauses-grid">
+      <article><span>Included</span><ul>{detail.included.map((item) => <li key={item}><Check size={16} /> {item}</li>)}</ul></article>
+      <article className="plan-clauses-excluded"><span>Not included</span><ul>{detail.excluded.map((item) => <li key={item}>— {item}</li>)}</ul></article>
+    </div>
+    <div className="fabric-care-notice"><Droplets size={22} /><div><span>Colour &amp; fabric care</span><p>{detail.colourCare}</p></div></div>
+    <p className="plan-detail-note"><strong>Please note:</strong> {detail.note}</p>
+  </section>;
+}
+
+function AlaCarteServices({ content }: { content: SiteContent }) {
+  const services = content.aLaCarte;
+  return <section className="ala-carte-section" id="ala-carte">
+    <div className="ala-carte-heading"><div><span className="kicker">{services.eyebrow}</span><h2>{services.title}</h2></div><p>{services.intro}</p></div>
+    <div className="ala-carte-grid">{services.groups.map((group, index) => <article className={index === 1 ? "ala-carte-card dark" : "ala-carte-card"} key={group.title}><span>{group.subtitle}</span><h3>{group.title}</h3><div>{group.items.map((item) => <p key={item.name}><span>{item.name}</span><strong>{item.price}</strong></p>)}</div></article>)}</div>
+    <div className="ala-carte-message"><MessageCircle size={25} /><div><span>For subscribers</span><p>{services.subscriberMessage}</p></div><WhatsAppRequest content={content} label="Message Washd" /></div>
+    <div className="ala-carte-notes"><article><CircleDollarSign size={19} /><p>{services.paymentNote}</p></article><article><Clock3 size={19} /><p>{services.scheduleNote}</p></article><article><Droplets size={19} /><p>{services.colourCareNote}</p></article><article><Sparkles size={19} /><p>{services.expressNote}</p></article></div>
+    <div className="ala-carte-rules"><div><span className="kicker">Service rules</span><h3>Per-piece and one-off care</h3></div><div>{services.rules.map((rule) => <details key={rule.title}><summary>{rule.title}<ArrowRight size={16} /></summary><p>{rule.body}</p></details>)}</div></div>
+  </section>;
+}
 
 export default function PlansPage() {
   const { user, loading: authLoading } = useAuth();
@@ -117,6 +146,7 @@ export default function PlansPage() {
             <Link className="button wide" href="/#custom-enquiry">Send an enquiry <ArrowRight size={17} /></Link>
           </article>
         </section>
+        <AlaCarteServices content={content} />
       </main>
     );
   }
@@ -146,8 +176,10 @@ export default function PlansPage() {
       {status === "cancelled" && <div className="checkout-banner">Checkout was cancelled. Your selection is still here.</div>}
       {error && <div className="checkout-banner error" role="alert">{error}</div>}
 
+      <PlanClauses detail={content.planDetails[selectedPlan.id]} />
+
       <section className="addons-section">
-        <div className="addons-heading"><div><span className="kicker">À-la-carte add-ons</span><h2>Make the plan fit your week.</h2></div><p>Optional monthly additions. Select only what you need and see your total before payment.</p></div>
+        <div className="addons-heading"><div><span className="kicker">Monthly plan add-ons</span><h2>Make the plan fit your month.</h2></div><p>These are recurring monthly additions. Select only what you need and see your total before payment.</p></div>
         <div className="addons-grid">
           {addons.map((addon, index) => {
             const checked = selectedAddons.includes(addon.id);
@@ -162,6 +194,8 @@ export default function PlansPage() {
           })}
         </div>
       </section>
+
+      <AlaCarteServices content={content} />
 
       <section className="other-plans-section">
         <div><span className="kicker">Compare before you decide</span><h2>Other memberships</h2></div>

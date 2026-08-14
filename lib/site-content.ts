@@ -68,6 +68,28 @@ export type SiteContent = {
     intro: string;
     extraNote: string;
   };
+  planDetails: Record<string, {
+    included: string[];
+    excluded: string[];
+    colourCare: string;
+    note: string;
+  }>;
+  aLaCarte: {
+    eyebrow: string;
+    title: string;
+    intro: string;
+    subscriberMessage: string;
+    paymentNote: string;
+    scheduleNote: string;
+    colourCareNote: string;
+    expressNote: string;
+    groups: Array<{
+      title: string;
+      subtitle: string;
+      items: Array<{ name: string; price: string }>;
+    }>;
+    rules: Array<{ title: string; body: string }>;
+  };
   customPlan: {
     title: string;
     body: string;
@@ -229,6 +251,54 @@ export const defaultSiteContent: SiteContent = {
     title: "Simple monthly plans",
     intro: "All plans run on the fixed Mon / Wed / Fri schedule. Cancel anytime with two weeks' notice.",
     extraNote: "Extra pressed shirt: +RM 8 each.",
+  },
+  planDetails: {
+    starter: {
+      included: ["Up to 5kg of everyday clothing per collection", "One collection each week: collected Monday, returned Wednesday", "Washing, drying and folding, returned neatly folded and ready to store", "Sign-up, reminders and service updates via WhatsApp"],
+      excluded: ["Ironing or pressing — this is a wash and fold plan", "Bedding, towels, curtains, rugs and other bulky items", "Dry-clean-only garments, delicates and special-care items", "Colour-run separation or hand-wash handling, arranged on enquiry"],
+      colourCare: "Standard plans wash everyday household laundry as a normal mixed load. New, dark or brightly dyed fabrics may release dye and transfer colour. Declare any colour-run, whites-separate or hand-wash items before collection so separate handling can be arranged on enquiry. Undeclared items are washed in the standard load at the owner’s risk.",
+      note: "The weight allowance applies to everyday clothing only and is measured on our scales at collection. Empty pockets and declare stained, delicate or special-care items before collection. Standard turnaround is approximately two days.",
+    },
+    active: {
+      included: ["Up to 5kg of everyday clothing per collection", "Two collections each week: Monday returned Wednesday; Wednesday returned Friday", "Washing, drying and folding, returned neatly folded", "Sign-up, reminders and service updates via WhatsApp"],
+      excluded: ["Ironing or pressing — this is a wash and fold plan", "Bedding, towels, curtains, rugs and other bulky items", "Dry-clean-only garments, delicates and special-care items", "Colour-run separation or hand-wash handling, arranged on enquiry"],
+      colourCare: "Standard plans wash everyday household laundry as a normal mixed load. New, dark or brightly dyed fabrics may release dye and transfer colour. Declare any colour-run, whites-separate or hand-wash items before collection so separate handling can be arranged on enquiry. Undeclared items are washed in the standard load at the owner’s risk.",
+      note: "The 5kg allowance applies to each collection and to everyday clothing only. It is measured on our scales. Empty pockets and declare stained, delicate or special-care items before collection. Standard turnaround is approximately two days.",
+    },
+    professional: {
+      included: ["Up to 7kg of everyday clothing per collection", "Four shirts professionally pressed and returned on hangers", "One collection each week: collected Monday, returned Wednesday", "Washing, drying and folding for the remainder of the laundry", "Sign-up, reminders and service updates via WhatsApp"],
+      excluded: ["Pressing beyond the four shirts included — additional shirts can be arranged on request", "Bedding, towels, curtains, rugs and other bulky items", "Dry-clean-only garments, delicates and special-care items", "Colour-run separation or hand-wash handling, arranged on enquiry"],
+      colourCare: "Standard plans wash everyday household laundry as a normal mixed load. New, dark or brightly dyed fabrics may release dye and transfer colour. Declare any colour-run, whites-separate or hand-wash items before collection so separate handling can be arranged on enquiry. Undeclared items are washed in the standard load at the owner’s risk.",
+      note: "The weight allowance applies to everyday clothing only and is measured on our scales at collection. Pressing applies to the four shirts included; all other items are neatly folded. Empty pockets and declare special-care items before collection.",
+    },
+    executive: {
+      included: ["Up to 7kg of everyday clothing per collection", "Seven shirts professionally pressed and returned on hangers", "One collection each week: collected Monday, returned Wednesday", "Washing, drying and folding for the remainder of the laundry", "Priority WhatsApp support, reminders and service updates"],
+      excluded: ["Pressing beyond the seven shirts included — additional shirts can be arranged on request", "Bedding, towels, curtains, rugs and other bulky items", "Dry-clean-only garments, delicates and special-care items", "Colour-run separation or hand-wash handling, arranged on enquiry"],
+      colourCare: "Standard plans wash everyday household laundry as a normal mixed load. New, dark or brightly dyed fabrics may release dye and transfer colour. Declare any colour-run, whites-separate or hand-wash items before collection so separate handling can be arranged on enquiry. Undeclared items are washed in the standard load at the owner’s risk.",
+      note: "The weight allowance applies to everyday clothing only and is measured on our scales at collection. Pressing applies to the seven shirts included; all other items are neatly folded. Empty pockets and declare special-care items before collection.",
+    },
+  },
+  aLaCarte: {
+    eyebrow: "À-la-carte services",
+    title: "Extra care, when your week needs it.",
+    intro: "Add individual garments to a planned collection or arrange a one-off service. Prices are per piece unless stated otherwise.",
+    subscriberMessage: "Need something extra in a given week, such as additional pressed shirts or a special item? Message us on WhatsApp before your collection day. We will confirm the price and send payment details, and add it to that week’s collection. Additional items are arranged and paid for in advance of collection.",
+    paymentNote: "One-off and per-piece services are paid in advance by QR pay or bank transfer. A minimum of four garments applies only to stand-alone per-piece orders; subscribers adding items to an existing collection have no minimum.",
+    scheduleNote: "Collections follow the fixed rhythm: Monday collection returns Wednesday; Wednesday collection returns Friday. Garments should be ready before 9:30am and are normally returned by 6:00pm. Pressed and dry-cleaned items return on hangers.",
+    colourCareNote: "Colour separation and hand-wash care must be declared in advance and are currently arranged on enquiry. Undeclared colour-run or special-care items are cleaned as a standard load at the owner’s risk.",
+    expressNote: "Next-day express return is available on request, subject to capacity, at a 50% surcharge on the standard item price.",
+    groups: [
+      { title: "Pressing / wash-iron-fold", subtitle: "Per piece", items: [{ name: "Shirt", price: "RM12" }, { name: "Pants", price: "RM12" }, { name: "Blouse", price: "RM12" }, { name: "Skirt (medium)", price: "RM12" }, { name: "Skirt (long)", price: "RM18" }, { name: "Jacket", price: "RM22" }] },
+      { title: "Dry cleaning with press", subtitle: "Per piece", items: [{ name: "Shirt", price: "RM26" }, { name: "Blouse", price: "RM26" }, { name: "Pants", price: "RM26" }, { name: "Skirt (medium)", price: "RM26" }, { name: "Skirt (long)", price: "RM30" }, { name: "Coat", price: "RM48" }] },
+      { title: "Wash, dry & fold", subtitle: "By weight", items: [{ name: "Everyday laundry", price: "RM8 / kg" }] },
+      { title: "Special requests", subtitle: "Confirmed before collection", items: [{ name: "Next-day express return", price: "+50%" }, { name: "Colour separation / hand wash", price: "On enquiry" }] },
+    ],
+    rules: [
+      { title: "Payment and minimum order", body: "Per-piece orders on their own have a minimum of four garments. Subscribers can add one or more pieces to an existing collection. Work starts once advance payment by QR pay or bank transfer is confirmed." },
+      { title: "Counting and garment care", body: "Garments are counted and inspected at collection and return. Existing marks, wear or damage recorded at collection are the reference point for a query. Stain treatment is best effort; complete removal cannot be guaranteed." },
+      { title: "Off-schedule rider service", body: "Off-schedule collection or return may be arranged through a third-party rider such as Lalamove or Grab. The rider cost and risk while the garments are in the rider’s care are borne by the customer." },
+      { title: "Concerns and liability", body: "Raise missing-item or quality concerns within 24 hours of return. Damage must be raised before the item is worn or washed again and returned for inspection. Where loss or damage is caused directly by Washd to a correctly declared item, liability is limited to ten times its cleaning value." },
+    ],
   },
   customPlan: {
     title: "Build your own plan",
