@@ -279,7 +279,7 @@ export const defaultSiteContent: SiteContent = {
     },
   },
   aLaCarte: {
-    eyebrow: "À-la-carte services",
+    eyebrow: "Additional services",
     title: "Extra care, when your week needs it.",
     intro: "Add individual garments to a planned collection or arrange a one-off service. Prices are per piece unless stated otherwise.",
     subscriberMessage: "Need something extra in a given week, such as additional pressed shirts or a special item? Message us on WhatsApp before your collection day. We will confirm the price and send payment details, and add it to that week’s collection. Additional items are arranged and paid for in advance of collection.",
@@ -343,7 +343,7 @@ export const defaultSiteContent: SiteContent = {
       { question: "Can I track my laundry after collection?", answer: "Yes. Your member dashboard updates as your bag is received, cleaned, finished and made ready for collection. You will also see the latest update time and expected return." },
       { question: "Are my clothes washed with another customer's laundry?", answer: "No. Every numbered bag is photographed, counted and processed as its own load. Your garments are never mixed with another household's laundry." },
       { question: "What can go into an Everyday Bag?", answer: "Everyday clothes, towels and suitable bed linen can go into the zipped bag. Delicates, specialty fabrics and items with unusual care labels should be discussed with us first." },
-      { question: "Can I add ironing or another bag without changing plans?", answer: "Yes. Choose an à-la-carte add-on while reviewing your plan, or send us a custom-plan enquiry if you need a different recurring combination." },
+      { question: "Can I add ironing or another bag without changing plans?", answer: "Yes. Choose an additional service while reviewing your plan, or send us a custom-plan enquiry if you need a different recurring combination." },
       { question: "What happens if I miss my building's drop time?", answer: "Your bag moves to the next scheduled route day. Message Washd as soon as possible and we will confirm the next available collection for your building." },
       { question: "How do payments and cancellations work?", answer: "Memberships are billed monthly through secure Stripe checkout. You can manage your payment method and cancel from your account, with two weeks' notice before the next service period." },
       { question: "What if an item is damaged or missing?", answer: "Report the issue within 24 hours of collection. Our photographed count and bag history help us investigate quickly, and qualifying issues are handled under the Washd care guarantee." },

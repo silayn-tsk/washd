@@ -29,9 +29,9 @@ function PlanClauses({ detail }: { detail: SiteContent["planDetails"][string] | 
 
 function AlaCarteServices({ content }: { content: SiteContent }) {
   const services = content.aLaCarte;
-  return <section className="ala-carte-section" id="ala-carte">
-    <div className="ala-carte-heading"><div><span className="kicker">{services.eyebrow}</span><h2>{services.title}</h2></div><p>{services.intro}</p></div>
-    <div className="ala-carte-grid">{services.groups.map((group, index) => <article className={index === 1 ? "ala-carte-card dark" : "ala-carte-card"} key={group.title}><span>{group.subtitle}</span><h3>{group.title}</h3><div>{group.items.map((item) => <p key={item.name}><span>{item.name}</span><strong>{item.price}</strong></p>)}</div></article>)}</div>
+  return <section className="ala-carte-section" id="additional-services">
+    <div className="ala-carte-heading"><div><span className="kicker">Additional services</span><h2>{services.title}</h2></div><p>{services.intro}</p></div>
+    <div className="ala-carte-grid">{services.groups.map((group) => <article className="ala-carte-card" key={group.title}><span>{group.subtitle}</span><h3>{group.title}</h3><div>{group.items.map((item) => <p key={item.name}><span>{item.name}</span><strong>{item.price}</strong></p>)}</div></article>)}</div>
     <div className="ala-carte-message"><MessageCircle size={25} /><div><span>For subscribers</span><p>{services.subscriberMessage}</p></div><WhatsAppRequest content={content} label="Message Washd" /></div>
     <div className="ala-carte-notes"><article><CircleDollarSign size={19} /><p>{services.paymentNote}</p></article><article><Clock3 size={19} /><p>{services.scheduleNote}</p></article><article><Droplets size={19} /><p>{services.colourCareNote}</p></article><article><Sparkles size={19} /><p>{services.expressNote}</p></article></div>
     <div className="ala-carte-rules"><div><span className="kicker">Service rules</span><h3>Per-piece and one-off care</h3></div><div>{services.rules.map((rule) => <details key={rule.title}><summary>{rule.title}<ArrowRight size={16} /></summary><p>{rule.body}</p></details>)}</div></div>
