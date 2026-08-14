@@ -45,6 +45,9 @@ export default function PlansPage() {
   const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
   const [previewAddon, setPreviewAddon] = useState<PlanAddon | null>(null);
   const [checkoutBusy, setCheckoutBusy] = useState(false);
+  const [planChangeBusy, setPlanChangeBusy] = useState(false);
+  const [membershipStatus, setMembershipStatus] = useState<string | null>(null);
+  const [membershipLoading, setMembershipLoading] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [error, setError] = useState("");
   const [status, setStatus] = useState<"success" | "cancelled" | "">("");
@@ -63,9 +66,23 @@ export default function PlansPage() {
     window.location.replace(`/login?next=${encodeURIComponent(next)}`);
   }, [authLoading, user, selectedPlanId]);
 
+  useEffect(() => {
+    if (authLoading || !user) return;
+    let cancelled = false;
+    queueMicrotask(() => { if (!cancelled) setMembershipLoading(true); });
+    void supabase.from("profiles").select("subscription_status").eq("id", user.id).maybeSingle().then(({ data }) => {
+      if (!cancelled) {
+        setMembershipStatus(data?.subscription_status || null);
+        setMembershipLoading(false);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [authLoading, user]);
+
   const selectedPlan = plans.find((plan) => plan.id === selectedPlanId);
   const selectedAddonRows = addons.filter((addon) => selectedAddons.includes(addon.id));
   const total = (selectedPlan?.price_rm || 0) + selectedAddonRows.reduce((sum, addon) => sum + addon.price_rm, 0);
+  const hasCurrentSubscription = ["active", "trialing", "past_due", "unpaid", "paused"].includes(membershipStatus || "");
 
   function toggleAddon(addon: PlanAddon) {
     setSelectedAddons((current) => current.includes(addon.id) ? current.filter((id) => id !== addon.id) : [...current, addon.id]);
@@ -132,6 +149,26 @@ export default function PlansPage() {
     }
   }
 
+  async function openPlanManager() {
+    setPlanChangeBusy(true);
+    setError("");
+    try {
+      if (!isSupabaseConfigured) throw new Error("Billing service is not configured");
+      const { data, error: portalError } = await supabase.functions.invoke<{ url: string }>("create-billing-portal-session", { body: { returnUrl: `${window.location.origin}/account` } });
+      if (portalError) {
+        const response = (portalError as unknown as { context?: Response }).context;
+        const problem = response ? await response.clone().json().catch(() => null) as { error?: unknown } | null : null;
+        throw new Error(typeof problem?.error === "string" ? problem.error : portalError.message);
+      }
+      if (!data?.url?.startsWith("https://")) throw new Error("Missing secure portal URL");
+      window.location.assign(data.url);
+    } catch (caught) {
+      const message = caught instanceof Error ? caught.message : "";
+      setError(message === "Subscribe to a plan before managing billing" ? "Your membership is still being activated. Please wait a moment, then try again." : "We couldn’t open your secure plan manager. Please try again or contact Washd for help.");
+      setPlanChangeBusy(false);
+    }
+  }
+
   function PlanCard({ plan, compact = false }: { plan: Plan; compact?: boolean }) {
     return (
       <article className={`${plan.popular ? "membership-card popular" : "membership-card"}${compact ? " compact" : ""}`}>
@@ -139,7 +176,7 @@ export default function PlansPage() {
         <h2>{plan.name}</h2><p>{plan.description}</p>
         <div className="plan-price"><span>RM</span><strong>{plan.price_rm}</strong><small>/ month</small></div>
         <ul>{plan.features.map((feature) => <li key={feature}><Check size={16} /> {feature}</li>)}</ul>
-        <button className="button wide" type="button" disabled={authLoading || contentLoading} onClick={() => choosePlan(plan)}>{user ? "View plan details" : "Log in to subscribe"} <ArrowRight size={17} /></button>
+        <button className="button wide" type="button" disabled={authLoading || contentLoading || membershipLoading} onClick={() => choosePlan(plan)}>{user ? hasCurrentSubscription ? "Choose this plan" : "View plan details" : "Log in to subscribe"} <ArrowRight size={17} /></button>
       </article>
     );
   }
@@ -232,7 +269,7 @@ export default function PlansPage() {
           <div className="review-total"><span>Monthly total</span><strong>RM {total}</strong></div>
           <small>Renews monthly. Cancel with two weeks’ notice. Add-ons renew with your selected plan.</small>
         </div>
-        <div className="payment-action"><LockKeyhole size={24} /><h3>Ready to subscribe?</h3><p>You’ll continue to Stripe to enter your card details securely.</p><label className="terms-acceptance"><input type="checkbox" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} /><span>I have reviewed and agree to the <Link href="/terms" target="_blank">Service Terms</Link> and <Link href="/service-information" target="_blank">Service Information</Link>. <Link href="/maklumat-perkhidmatan" target="_blank">Bahasa Malaysia</Link></span></label>{!termsAccepted && <small className="terms-required-hint">Tick the agreement above to unlock secure payment.</small>}<button className="button wide gold-button" type="button" disabled={checkoutBusy || !termsAccepted} onClick={() => void makePayment()}>{checkoutBusy ? "Opening secure payment…" : "Make payment"} <ArrowRight size={18} /></button><small>Washd never stores your complete card number.</small></div>
+        {hasCurrentSubscription ? <div className="payment-action"><PackageCheck size={24} /><h3>Ready to change?</h3><p>You selected the {selectedPlan.name} plan. Continue to Stripe to confirm your change securely.</p><button className="button wide gold-button" type="button" disabled={planChangeBusy} onClick={() => void openPlanManager()}>{planChangeBusy ? "Opening plan manager…" : "Continue to Stripe"} <ArrowRight size={18} /></button><small>Stripe will show the available Washd plans and confirm the change before anything is updated.</small></div> : <div className="payment-action"><LockKeyhole size={24} /><h3>Ready to subscribe?</h3><p>You’ll continue to Stripe to enter your card details securely.</p><label className="terms-acceptance"><input type="checkbox" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} /><span>I have reviewed and agree to the <Link href="/terms" target="_blank">Service Terms</Link> and <Link href="/service-information" target="_blank">Service Information</Link>.</span></label>{!termsAccepted && <small className="terms-required-hint">Tick the agreement above to unlock secure payment.</small>}<button className="button wide gold-button" type="button" disabled={checkoutBusy || !termsAccepted} onClick={() => void makePayment()}>{checkoutBusy ? "Opening secure payment…" : "Make payment"} <ArrowRight size={18} /></button><small>Washd never stores your complete card number.</small></div>}
       </section>
 
       {previewAddon && <div className="addon-sheet-backdrop" role="presentation" onClick={() => setPreviewAddon(null)}>
