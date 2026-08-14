@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, CalendarDays, Check, CircleDollarSign, Clock3, Droplets, LockKeyhole, MessageCircle, PackageCheck, Shirt, SlidersHorizontal, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarDays, Check, CircleDollarSign, Clock3, Droplets, LockKeyhole, MessageCircle, PackageCheck, Shirt, SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { useAuth } from "../auth-provider";
 import Link from "next/link";
 import { MemberHeader } from "../member-header";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { useSiteContent } from "../use-site-content";
-import type { Plan, SiteContent } from "@/lib/site-content";
+import type { Plan, PlanAddon, SiteContent } from "@/lib/site-content";
 
 function WhatsAppRequest({ content, label = "Request on WhatsApp" }: { content: SiteContent; label?: string }) {
   const message = encodeURIComponent("Hi Washd, I would like to arrange a per-piece or special-care laundry item for my next collection.");
@@ -43,6 +43,7 @@ export default function PlansPage() {
   const { content, plans, addons, loading: contentLoading } = useSiteContent();
   const [selectedPlanId, setSelectedPlanId] = useState("");
   const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
+  const [previewAddon, setPreviewAddon] = useState<PlanAddon | null>(null);
   const [checkoutBusy, setCheckoutBusy] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [error, setError] = useState("");
@@ -65,6 +66,10 @@ export default function PlansPage() {
   const selectedPlan = plans.find((plan) => plan.id === selectedPlanId);
   const selectedAddonRows = addons.filter((addon) => selectedAddons.includes(addon.id));
   const total = (selectedPlan?.price_rm || 0) + selectedAddonRows.reduce((sum, addon) => sum + addon.price_rm, 0);
+
+  function toggleAddon(addon: PlanAddon) {
+    setSelectedAddons((current) => current.includes(addon.id) ? current.filter((id) => id !== addon.id) : [...current, addon.id]);
+  }
 
   function choosePlan(plan: Plan) {
     if (!user) {
@@ -184,12 +189,11 @@ export default function PlansPage() {
           {addons.map((addon, index) => {
             const checked = selectedAddons.includes(addon.id);
             return (
-              <label className={checked ? "addon-card selected" : "addon-card"} key={addon.id}>
-                <input type="checkbox" checked={checked} onChange={() => setSelectedAddons((current) => checked ? current.filter((id) => id !== addon.id) : [...current, addon.id])} />
+              <button className={checked ? "addon-card selected" : "addon-card"} key={addon.id} type="button" onClick={() => setPreviewAddon(addon)} aria-label={`View ${addon.name}`}>
                 <span className="addon-icon">{index % 2 === 0 ? <Shirt size={21} /> : <PackageCheck size={21} />}</span>
                 <strong>{addon.name}</strong><p>{addon.description}</p>
                 <div><span>+ RM {addon.price_rm}</span><small>/ month</small><i>{checked ? <Check size={15} /> : "+"}</i></div>
-              </label>
+              </button>
             );
           })}
         </div>
@@ -205,7 +209,7 @@ export default function PlansPage() {
         </div>
       </section>
 
-      <section className="payment-review">
+      <section className="payment-review" id="payment-review">
         <div>
           <span className="kicker">Final review</span><h2>Your Washd membership</h2>
           <div className="review-line"><span>{selectedPlan.name} plan</span><strong>RM {selectedPlan.price_rm}</strong></div>
@@ -215,6 +219,23 @@ export default function PlansPage() {
         </div>
         <div className="payment-action"><LockKeyhole size={24} /><h3>Ready to subscribe?</h3><p>You’ll continue to Stripe to enter your card details securely.</p><label className="terms-acceptance"><input type="checkbox" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} /><span>I have reviewed and agree to the <Link href="/terms" target="_blank">Service Terms</Link> and <Link href="/service-information" target="_blank">Service Information</Link>. <Link href="/maklumat-perkhidmatan" target="_blank">Bahasa Malaysia</Link></span></label><button className="button wide gold-button" type="button" disabled={checkoutBusy || !termsAccepted} onClick={() => void makePayment()}>{checkoutBusy ? "Opening secure payment…" : "Make payment"} <ArrowRight size={18} /></button><small>Washd never stores your complete card number.</small></div>
       </section>
+
+      {previewAddon && <div className="addon-sheet-backdrop" role="presentation" onClick={() => setPreviewAddon(null)}>
+        <section className="addon-sheet" role="dialog" aria-modal="true" aria-labelledby="addon-sheet-title" onClick={(event) => event.stopPropagation()}>
+          <span className="addon-sheet-handle" />
+          <button className="addon-sheet-close" type="button" onClick={() => setPreviewAddon(null)} aria-label="Close add-on details"><X size={20} /></button>
+          <span className="kicker">Monthly plan add-on</span>
+          <span className="addon-icon"><PackageCheck size={22} /></span>
+          <h2 id="addon-sheet-title">{previewAddon.name}</h2>
+          <p>{previewAddon.description}</p>
+          <div className="addon-sheet-price"><span>+ RM {previewAddon.price_rm}</span><small>per month, added to your Washd plan</small></div>
+          <button className="button wide gold-button" type="button" onClick={() => { toggleAddon(previewAddon); setPreviewAddon(null); }}>{selectedAddons.includes(previewAddon.id) ? "Remove from plan" : "Add to my plan"} <ArrowRight size={18} /></button>
+        </section>
+      </div>}
+
+      <button className="mobile-plan-bar" type="button" onClick={() => document.getElementById("payment-review")?.scrollIntoView({ behavior: "smooth", block: "start" })}>
+        <span><small>Your monthly plan</small><strong>RM {total}</strong></span><span>{selectedAddons.length ? `${selectedAddons.length} add-on${selectedAddons.length === 1 ? "" : "s"}` : "Review plan"} <ArrowRight size={17} /></span>
+      </button>
     </main>
   );
 }
