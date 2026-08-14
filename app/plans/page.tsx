@@ -107,11 +107,27 @@ export default function PlansPage() {
           cancelUrl: `${origin}/plans?plan=${encodeURIComponent(selectedPlan.id)}&checkout=cancelled`,
         },
       });
-      if (checkoutError) throw checkoutError;
+      if (checkoutError) {
+        const response = (checkoutError as unknown as { context?: Response }).context;
+        const problem = response ? await response.clone().json().catch(() => null) as { error?: unknown } | null : null;
+        throw new Error(typeof problem?.error === "string" ? problem.error : checkoutError.message);
+      }
       if (!data?.url?.startsWith("https://")) throw new Error("Missing secure checkout URL");
       window.location.assign(data.url);
     } catch (caught) {
-      setError(caught instanceof Error && caught.message === "TERMS_REQUIRED" ? "Review and accept the service terms before continuing to payment." : "We couldn’t open secure payment. Please try again or contact Washd for help.");
+      const message = caught instanceof Error ? caught.message : "";
+      const explanation = message === "TERMS_REQUIRED" || message === "Service terms must be accepted"
+        ? "Tick the service-terms box before continuing to secure payment."
+        : message === "Please log in first"
+          ? "Please log in before starting secure payment."
+          : message.startsWith("Stripe price is not configured")
+            ? "This membership is not connected to Stripe yet. Please contact Washd while we complete its payment setup."
+            : message === "Live checkout is not yet available"
+              ? "Secure payment is being finalised and is not available yet. Please contact Washd for help."
+              : message.includes("already have a subscription")
+                ? message
+                : "We couldn’t open secure payment. Please try again or contact Washd for help.";
+      setError(explanation);
       setCheckoutBusy(false);
     }
   }
@@ -217,7 +233,7 @@ export default function PlansPage() {
           <div className="review-total"><span>Monthly total</span><strong>RM {total}</strong></div>
           <small>Renews monthly. Cancel with two weeks’ notice. Add-ons renew with your selected plan.</small>
         </div>
-        <div className="payment-action"><LockKeyhole size={24} /><h3>Ready to subscribe?</h3><p>You’ll continue to Stripe to enter your card details securely.</p><label className="terms-acceptance"><input type="checkbox" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} /><span>I have reviewed and agree to the <Link href="/terms" target="_blank">Service Terms</Link> and <Link href="/service-information" target="_blank">Service Information</Link>. <Link href="/maklumat-perkhidmatan" target="_blank">Bahasa Malaysia</Link></span></label><button className="button wide gold-button" type="button" disabled={checkoutBusy || !termsAccepted} onClick={() => void makePayment()}>{checkoutBusy ? "Opening secure payment…" : "Make payment"} <ArrowRight size={18} /></button><small>Washd never stores your complete card number.</small></div>
+        <div className="payment-action"><LockKeyhole size={24} /><h3>Ready to subscribe?</h3><p>You’ll continue to Stripe to enter your card details securely.</p><label className="terms-acceptance"><input type="checkbox" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} /><span>I have reviewed and agree to the <Link href="/terms" target="_blank">Service Terms</Link> and <Link href="/service-information" target="_blank">Service Information</Link>. <Link href="/maklumat-perkhidmatan" target="_blank">Bahasa Malaysia</Link></span></label>{!termsAccepted && <small className="terms-required-hint">Tick the agreement above to unlock secure payment.</small>}<button className="button wide gold-button" type="button" disabled={checkoutBusy || !termsAccepted} onClick={() => void makePayment()}>{checkoutBusy ? "Opening secure payment…" : "Make payment"} <ArrowRight size={18} /></button><small>Washd never stores your complete card number.</small></div>
       </section>
 
       {previewAddon && <div className="addon-sheet-backdrop" role="presentation" onClick={() => setPreviewAddon(null)}>

@@ -739,6 +739,7 @@ h1 em, h2 em { color: #4f83ed; font-weight: 390; }
 .terms-acceptance { margin-top: 22px; display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; color: #4f6266; font-size: 11px; line-height: 1.55; cursor: pointer; }
 .terms-acceptance input { width: 18px; height: 18px; margin: 0; accent-color: #1A7A8C; }
 .terms-acceptance a { color: #0f6978; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+.payment-action .terms-required-hint { margin-top: 12px; display: block; color: #8a6b2e; font-size: 10px; font-weight: 700; }
 
 .dashboard-page { min-height: 100vh; background: #EEF4F3; }
 .dashboard-title { max-width: 1240px; margin: 0 auto; padding: 65px 30px 35px; display: flex; justify-content: space-between; align-items: end; gap: 45px; }.dashboard-title h1 { margin: 12px 0 8px; font: 600 clamp(46px,6vw,78px)/.95 var(--font-montserrat), Arial, sans-serif; letter-spacing: -.055em; }.dashboard-title p { color: #5A6B6E; }.member-id-card { min-width: 235px; padding: 19px 22px; color: white; background: #0A2E36; display: grid; gap: 5px; }.member-id-card span, .member-id-card small { color: rgba(255,255,255,.53); font-size: 9px; }.member-id-card strong { color: #C9A86A; font: 600 24px/1.2 var(--font-montserrat), Arial, sans-serif; text-transform: lowercase; }
