@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, CalendarDays, Check, CircleDollarSign, Clock3, Droplets, LockKeyhole, MessageCircle, PackageCheck, Shirt, SlidersHorizontal, Sparkles, X } from "lucide-react";
+import { AlertCircle, ArrowLeft, ArrowRight, CalendarDays, Check, CircleDollarSign, Clock3, Droplets, LockKeyhole, MessageCircle, PackageCheck, Shirt, SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { useAuth } from "../auth-provider";
 import Link from "next/link";
 import { MemberHeader } from "../member-header";
@@ -195,7 +195,6 @@ export default function PlansPage() {
       </section>
 
       {status === "cancelled" && <div className="checkout-banner">Checkout was cancelled. Your selection is still here.</div>}
-      {error && <div className="checkout-banner error" role="alert">{error}</div>}
 
       <PlanClauses detail={content.planDetails[selectedPlan.id]} />
 
@@ -252,6 +251,13 @@ export default function PlansPage() {
       <button className="mobile-plan-bar" type="button" onClick={() => document.getElementById("payment-review")?.scrollIntoView({ behavior: "smooth", block: "start" })}>
         <span><small>Your monthly plan</small><strong>RM {total}</strong></span><span>{selectedAddons.length ? `${selectedAddons.length} add-on${selectedAddons.length === 1 ? "" : "s"}` : "Review plan"} <ArrowRight size={17} /></span>
       </button>
+
+      {error && <div className="checkout-error-popover" role="alert" aria-live="assertive">
+        <AlertCircle size={21} />
+        <p>{error}</p>
+        {error.includes("already have a subscription") ? <Link className="checkout-error-action" href="/account">Go to my account <ArrowRight size={15} /></Link> : <button type="button" onClick={() => setError("")}>Okay</button>}
+        <button className="checkout-error-close" type="button" onClick={() => setError("")} aria-label="Close message"><X size={17} /></button>
+      </div>}
     </main>
   );
 }
