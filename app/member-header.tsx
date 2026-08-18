@@ -15,7 +15,7 @@ export function MemberHeader() {
         {user && <Link className="member-dashboard-link" href="/account">Dashboard</Link>}
         <Link href="/plans">Plans</Link>
         {!loading && (
-          <Link className="member-pill" href={user ? "/account" : "/login"}>
+          <Link className="member-pill" href={user ? "/profile" : "/login"}>
             {user ? "My profile" : "Log in"}
           </Link>
         )}
