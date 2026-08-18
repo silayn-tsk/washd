@@ -194,4 +194,4 @@ const { error: disableAddonsError } = await supabase
   .eq("active", true);
 if (disableAddonsError) throw disableAddonsError;
 
-console.log(`Configured four Stripe ${stripeSecretKey.startsWith("sk_live_") ? "live" : "test"} subscriptions, four add-ons, the billing portal, and the signed Washd webhook.`);
+console.log(`Configured four Stripe ${stripeSecretKey.startsWith("sk_live_") ? "live" : "test"} subscriptions, no recurring add-ons, the billing portal, and the signed Washd webhook.`);
