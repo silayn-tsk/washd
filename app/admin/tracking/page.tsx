@@ -74,15 +74,15 @@ export default function AdminTrackingPage() {
     });
   }, [selectedMember, memberBag, memberCollection]);
 
-  async function saveTracking() {
+  async function saveTracking(nextStatus = status) {
     if (!selectedMember) return;
     setBusy(true); setError(""); setNotice("");
     const { data, error: updateError } = await supabase.functions.invoke<{ error?: string }>("admin-update-tracking", {
-      body: { memberId: selectedMember.id, bagId, status, collectionDue: new Date(collectionDue).toISOString(), location },
+      body: { memberId: selectedMember.id, bagId, status: nextStatus, collectionDue: new Date(collectionDue).toISOString(), location },
     });
     setBusy(false);
     if (updateError || data?.error) { setError(data?.error || "Tracking could not be updated."); return; }
-    setNotice(`${selectedMember.member_id} now shows “${status}” in the live dashboard.`);
+    setNotice(nextStatus === "empty" ? `${selectedMember.member_id}'s live tracking has been cleared.` : `${selectedMember.member_id} now shows “${nextStatus}” in the live dashboard.`);
     await loadOperations();
   }
 
@@ -98,7 +98,7 @@ export default function AdminTrackingPage() {
         <section className="tracking-admin-editor">
           <span className="kicker">Live member tracking</span><h1>{selectedMember?.name || "Choose a member"}</h1><p>{selectedMember?.member_id} · {selectedMember?.email}</p>
           {notice && <div className="admin-notice success"><CheckCircle2 size={18} /> {notice}</div>}{error && <div className="admin-notice error"><ShieldAlert size={18} /> {error}</div>}
-          {selectedMember && <div className="tracking-admin-card"><div className="tracking-admin-current"><PackageCheck size={28} /><div><span>Currently visible</span><strong>{memberBag?.status || "No bag yet"}</strong><small>{memberBag?.id || "Create the first tracking cycle below"}</small></div></div><div className="admin-fields"><label className="admin-field"><span>Bag ID</span><input value={bagId} onChange={(event) => setBagId(event.target.value.toUpperCase())} /></label><label className="admin-field"><span>Live status</span><select value={status} onChange={(event) => setStatus(event.target.value)}><option value="received">Bag received</option><option value="washing">Cleaning</option><option value="finishing">Finishing</option><option value="ready">Ready for collection</option></select></label><label className="admin-field"><span>Expected return</span><input type="datetime-local" value={collectionDue} onChange={(event) => setCollectionDue(event.target.value)} /></label><label className="admin-field"><span>Collection point</span><input value={location} onChange={(event) => setLocation(event.target.value)} /></label></div><div className="tracking-admin-hint"><Clock3 size={17} /> Saving updates the member dashboard instantly and adds a timestamped event to the bag history.</div></div>}
+          {selectedMember && <div className="tracking-admin-card"><div className="tracking-admin-current"><PackageCheck size={28} /><div><span>Currently visible</span><strong>{memberBag?.status || "No bag yet"}</strong><small>{memberBag?.id || "Create the first tracking cycle below"}</small></div></div><div className="admin-fields"><label className="admin-field"><span>Bag ID</span><input value={bagId} onChange={(event) => setBagId(event.target.value.toUpperCase())} /></label><label className="admin-field"><span>Live status</span><select value={status} onChange={(event) => setStatus(event.target.value)}><option value="received">Bag received</option><option value="washing">Cleaning</option><option value="finishing">Finishing</option><option value="ready">Ready for collection</option><option value="empty">Empty — hide live tracking</option></select></label><label className="admin-field"><span>Expected return</span><input type="datetime-local" value={collectionDue} onChange={(event) => setCollectionDue(event.target.value)} /></label><label className="admin-field"><span>Collection point</span><input value={location} onChange={(event) => setLocation(event.target.value)} /></label></div><div className="tracking-admin-actions"><button type="button" disabled={busy || !memberBag} onClick={() => void saveTracking("empty")}>Mark tracking empty</button></div><div className="tracking-admin-hint"><Clock3 size={17} /> Saving updates the member dashboard instantly and adds a timestamped event to the bag history.</div></div>}
         </section>
       </div>
     </main>

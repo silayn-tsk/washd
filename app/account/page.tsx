@@ -28,6 +28,7 @@ const trackingSteps = [
   { key: "washing", label: "Cleaning", caption: "Washed separately" },
   { key: "finishing", label: "Finishing", caption: "Folded or pressed" },
   { key: "ready", label: "Ready", caption: "At your collection point" },
+  { key: "collected", label: "Collected", caption: "Confirm you have collected your bag" },
 ];
 
 function trackingIndex(status?: string) {
@@ -70,6 +71,7 @@ export default function AccountPage() {
   const [memberIdCopied, setMemberIdCopied] = useState(false);
   const [pickupDayChoice, setPickupDayChoice] = useState<PickupDay | null>(null);
   const [pickupDayBusy, setPickupDayBusy] = useState(false);
+  const [collectionConfirming, setCollectionConfirming] = useState(false);
 
   const loadDashboard = useCallback(async () => {
     if (!user) return;
@@ -117,6 +119,7 @@ export default function AccountPage() {
   }
 
   const activeStep = trackingIndex(bag?.status);
+  const shouldShowTracking = Boolean(bag && !["empty", "collected"].includes(bag.status));
   const plan = plans.find((candidate) => candidate.id === profile.plan_id);
   const planName = plan?.name || profile.plan_id?.replaceAll("-", " ") || "No active plan";
   const activeAddonRows = addons.filter((addon) => profile.active_addons?.includes(addon.id));
@@ -154,6 +157,21 @@ export default function AccountPage() {
     setPickupDayBusy(false);
   }
 
+  async function confirmBagCollection() {
+    if (!bag || bag.status !== "ready") return;
+    setCollectionConfirming(true);
+    setError("");
+    try {
+      const { data, error: confirmError } = await supabase.functions.invoke<{ error?: string }>("member-confirm-bag-collection", { body: { bagId: bag.id } });
+      if (confirmError || data?.error) throw new Error(data?.error || "Unable to confirm collection");
+      await loadDashboard();
+    } catch {
+      setError("We couldn’t confirm collection yet. Please refresh and try again, or contact Washd on WhatsApp.");
+    } finally {
+      setCollectionConfirming(false);
+    }
+  }
+
   if (loading || !user) return <main className="member-page"><MemberHeader /><div className="account-loading">Loading your Washd dashboard…</div></main>;
 
   return (
@@ -171,17 +189,17 @@ export default function AccountPage() {
       {checkoutSuccess && <div className="checkout-banner success"><Check size={19} /> Payment complete. Your new membership will appear here as soon as confirmation arrives.</div>}
       {error && <div className="checkout-banner error" role="alert">{error}</div>}
 
-      <section className="tracking-card">
+      {shouldShowTracking && <section className="tracking-card">
         <div className="tracking-topline"><div><span className="live-dot" /> Live bag tracking</div><button type="button" onClick={() => void loadDashboard()} disabled={dataLoading}><RefreshCw size={15} className={dataLoading ? "spin" : ""} /> Refresh</button></div>
         <div className="tracking-summary">
-          <div><span>{bag ? `Bag ${bag.id}` : "Your next Washd bag"}</span><h2>{bag ? trackingSteps[Math.max(activeStep, 0)]?.label || "In our care" : "Ready for your next drop"}</h2><p>{bag ? latestEvent?.label || "Your bag is moving through the Washd care process." : `Drop by 9:30am on ${formatDate(nextDrop)}.`}</p></div>
-          <div className="return-estimate"><Clock3 size={20} /><span>{bag ? "Expected return" : "Next drop"}</span><strong>{formatDate(nextDue, { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}</strong></div>
+          <div><span>{`Bag ${bag?.id}`}</span><h2>{trackingSteps[Math.max(activeStep, 0)]?.label || "In our care"}</h2><p>{latestEvent?.label || "Your bag is moving through the Washd care process."}</p></div>
+          <div className="return-estimate"><Clock3 size={20} /><span>Expected return</span><strong>{formatDate(nextDue, { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}</strong></div>
         </div>
         <div className="tracking-progress">
-          {trackingSteps.map((step, index) => <div className={index < activeStep ? "done" : index === activeStep ? "active" : ""} key={step.key}><span>{index <= activeStep ? <Check size={15} /> : index + 1}</span><strong>{step.label}</strong><small>{step.caption}</small></div>)}
+          {trackingSteps.map((step, index) => <div className={index < activeStep ? "done" : index === activeStep ? "active" : ""} key={step.key}><span>{index <= activeStep ? <Check size={15} /> : index + 1}</span><strong>{step.label}</strong><small>{step.caption}</small>{step.key === "collected" && bag?.status === "ready" && <button type="button" className="confirm-collection-button" disabled={collectionConfirming} onClick={() => void confirmBagCollection()}>{collectionConfirming ? "Saving…" : "Confirm collected"}</button>}</div>)}
         </div>
         <div className="tracking-footer"><span><Truck size={15} /> Updates appear here as our team scans your numbered bag.</span><small>{lastUpdated ? `Last update ${formatDate(lastUpdated, { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}` : "Waiting for your first scan"}</small></div>
-      </section>
+      </section>}
 
       <section className="dashboard-grid">
         <article className="dashboard-card collection-card"><div className="dashboard-card-icon"><CalendarDays size={22} /></div><span>Next collection</span><h3>{formatDate(nextDue)}</h3><p><Clock3 size={15} /> {collection ? formatDate(collection.due, { hour: "numeric", minute: "2-digit" }) : "Drop by 9:30am"}</p><p><MapPin size={15} /> {collection?.location || profile.unit || "Residence lobby"}</p><small>{collection ? collection.status : "Fixed weekly route"}</small></article>
