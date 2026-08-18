@@ -20,8 +20,8 @@ const sectionLabels: Record<string, string> = {
   routine: "How it works",
   services: "Services",
   membership: "Membership introduction",
-  planDetails: "Plan clauses & inclusions",
-  aLaCarte: "Per-piece & one-off services",
+  planDetails: "Plan details & care clauses",
+  aLaCarte: "Additional service support",
   customPlan: "Custom plan",
   safety: "Safety promise",
   benefits: "Member benefits",
@@ -95,6 +95,40 @@ function ResidencesEditor({ residences, onChange }: { residences: SiteContent["r
   </div>;
 }
 
+function PlanDetailsEditor({ details, onChange }: { details: SiteContent["planDetails"]; onChange: (path: PathPart[], value: EditableValue) => void }) {
+  const addItem = (planId: string, field: "included" | "excluded") => {
+    const current = details[planId]?.[field] || [];
+    onChange(["planDetails", planId, field], [...current, "New detail"]);
+  };
+
+  return <div className="admin-plan-list">
+    <div className="admin-policy-guidance admin-live-guidance"><BookOpenText size={19} /><div><strong>What members see before payment</strong><p>These clauses appear on each selected membership page before a customer continues to Stripe.</p></div></div>
+    {Object.entries(details).map(([planId, detail]) => <article className="admin-plan-card" key={planId}>
+      <div className="admin-plan-heading"><span>{planId} plan</span><small>Public plan details</small></div>
+      <div className="admin-clause-columns">
+        {(["included", "excluded"] as const).map((field) => <section key={field} className={field === "included" ? "admin-clause-list included" : "admin-clause-list excluded"}>
+          <div><strong>{field === "included" ? "Included" : "Not included"}</strong><button type="button" onClick={() => addItem(planId, field)}><Plus size={15} /> Add item</button></div>
+          {detail[field].map((item, index) => <label key={`${field}-${index}`}><input value={item} onChange={(event) => onChange(["planDetails", planId, field], detail[field].map((value, itemIndex) => itemIndex === index ? event.target.value : value))} /><button type="button" aria-label={`Remove ${field} item ${index + 1}`} onClick={() => onChange(["planDetails", planId, field], detail[field].filter((_, itemIndex) => itemIndex !== index))}><Trash2 size={15} /></button></label>)}
+        </section>)}
+      </div>
+      <div className="admin-fields">
+        <label className="admin-field full"><span>Colour and fabric care notice</span><textarea value={detail.colourCare} onChange={(event) => onChange(["planDetails", planId, "colourCare"], event.target.value)} /></label>
+        <label className="admin-field full"><span>Important note</span><textarea value={detail.note} onChange={(event) => onChange(["planDetails", planId, "note"], event.target.value)} /></label>
+      </div>
+    </article>)}
+  </div>;
+}
+
+function AdditionalServiceEditor({ service, onChange }: { service: SiteContent["aLaCarte"]; onChange: (path: PathPart[], value: EditableValue) => void }) {
+  return <div className="admin-section-card admin-additional-service-editor">
+    <div className="admin-policy-guidance admin-live-guidance"><BookOpenText size={19} /><div><strong>Additional service support</strong><p>The public plan pages no longer show monthly add-on cards. This message is shown beside the payment action and sends members to WhatsApp to arrange one-off extras.</p></div></div>
+    <div className="admin-fields">
+      <label className="admin-field full"><span>Member support message</span><textarea value={service.subscriberMessage} onChange={(event) => onChange(["aLaCarte", "subscriberMessage"], event.target.value)} /></label>
+    </div>
+    <div className="admin-support-preview"><span>Live button</span><strong>Contact Washd on WhatsApp</strong><small>Uses the WhatsApp number in Contact details.</small></div>
+  </div>;
+}
+
 function PolicyEditor({ policy, policyKey, onChange }: { policy: PolicyPageContent; policyKey: keyof SiteContent["policies"]; onChange: (path: PathPart[], value: EditableValue) => void }) {
   const basePath: PathPart[] = ["policies", policyKey];
   return <div className="admin-policy-workspace">
@@ -134,8 +168,7 @@ export default function AdminPage() {
   const activeTitle = activePolicyKey
     ? policyLabels[activePolicyKey]
     : activeSection === "plans" ? "Membership plans"
-      : activeSection === "addons" ? "Monthly Stripe add-ons"
-        : sectionLabels[activeSection];
+      : sectionLabels[activeSection];
 
   useEffect(() => {
     if (!authLoading && !user) window.location.replace("/login?next=/admin");
@@ -164,11 +197,6 @@ export default function AdminPage() {
 
   function updatePlan(index: number, key: keyof Plan, value: string | number | boolean | string[]) {
     setPlans((current) => current.map((plan, planIndex) => planIndex === index ? { ...plan, [key]: value } : plan));
-    setNotice("");
-  }
-
-  function updateAddon(index: number, key: keyof PlanAddon, value: string | number | boolean) {
-    setAddons((current) => current.map((addon, addonIndex) => addonIndex === index ? { ...addon, [key]: value } : addon));
     setNotice("");
   }
 
@@ -227,7 +255,6 @@ export default function AdminPage() {
           {(Object.keys(policyLabels) as Array<keyof typeof policyLabels>).map((key) => <button className={activeSection === `policy-${key}` ? "active" : ""} type="button" key={key} onClick={() => setActiveSection(`policy-${key}`)}><BookOpenText size={14} /> {policyLabels[key]}</button>)}
           <strong>Commerce</strong>
           <button className={activeSection === "plans" ? "active" : ""} type="button" onClick={() => setActiveSection("plans")}>Membership plans</button>
-          <button className={activeSection === "addons" ? "active" : ""} type="button" onClick={() => setActiveSection("addons")}>Monthly Stripe add-ons</button>
           <strong>Operations</strong>
           <Link className="admin-operation-link" href="/admin/tracking">Member tracking <span>↗</span></Link>
           <Link className="admin-operation-link" href="/admin/enquiries">Enquiry inbox <span>↗</span></Link>
@@ -244,6 +271,10 @@ export default function AdminPage() {
           <div className="admin-panel-transition" key={activeSection}>
           {activePolicyKey ? (
             <PolicyEditor policy={content.policies[activePolicyKey]} policyKey={activePolicyKey} onChange={updateContent} />
+          ) : activeSection === "planDetails" ? (
+            <PlanDetailsEditor details={content.planDetails} onChange={updateContent} />
+          ) : activeSection === "aLaCarte" ? (
+            <AdditionalServiceEditor service={content.aLaCarte} onChange={updateContent} />
           ) : activeSection === "residences" ? (
             <ResidencesEditor residences={content.residences} onChange={updateContent} />
           ) : activeSection === "plans" ? (
@@ -258,16 +289,6 @@ export default function AdminPage() {
                     <label className="admin-field full"><span>Features (one per line)</span><textarea value={plan.features.join("\n")} onChange={(event) => updatePlan(index, "features", event.target.value.split("\n").filter(Boolean))} /></label>
                   </div>
                   <small>Changing the price creates a matching monthly price in Stripe when you save.</small>
-                </article>
-              ))}
-            </div>
-          ) : activeSection === "addons" ? (
-            <div className="admin-plan-list">
-              {addons.map((addon, index) => (
-                <article className="admin-plan-card" key={addon.id}>
-                  <div className="admin-plan-heading"><span>Add-on {index + 1}</span><label className="admin-checkbox"><input type="checkbox" checked={addon.active} onChange={(event) => updateAddon(index, "active", event.target.checked)} /><span>Available</span></label></div>
-                  <div className="admin-fields"><label className="admin-field"><span>Name</span><input value={addon.name} onChange={(event) => updateAddon(index, "name", event.target.value)} /></label><label className="admin-field"><span>Monthly price (RM)</span><input type="number" min={1} max={5000} value={addon.price_rm} onChange={(event) => updateAddon(index, "price_rm", Number(event.target.value))} /></label><label className="admin-field full"><span>Description</span><textarea value={addon.description} onChange={(event) => updateAddon(index, "description", event.target.value)} /></label></div>
-                  <small>Price changes create a matching recurring Stripe price when you save.</small>
                 </article>
               ))}
             </div>
