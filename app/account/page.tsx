@@ -43,15 +43,19 @@ function trackingIndex(status?: string) {
 type PickupDay = "monday" | "wednesday";
 
 function nextFixedDrop(pickupDay?: PickupDay) {
-  const date = new Date();
+  const now = new Date();
+  // New Washd routes begin in September 2026. Keep the start date local so the
+  // displayed weekday stays correct for members viewing from Malaysia.
+  const routeStart = new Date(2026, 8, 1, 0, 0, 0, 0);
+  const date = now > routeStart ? now : routeStart;
   for (let days = 0; days < 8; days += 1) {
     const candidate = new Date(date);
     candidate.setDate(date.getDate() + days);
     candidate.setHours(9, 30, 0, 0);
     const allowedDay = pickupDay === "monday" ? 1 : pickupDay === "wednesday" ? 3 : undefined;
-    if ((allowedDay ? candidate.getDay() === allowedDay : [1, 3].includes(candidate.getDay())) && candidate > date) return candidate;
+    if ((allowedDay ? candidate.getDay() === allowedDay : [1, 3].includes(candidate.getDay())) && candidate > now) return candidate;
   }
-  return date;
+  return now;
 }
 
 function formatDate(value: string | Date, options?: Intl.DateTimeFormatOptions) {
