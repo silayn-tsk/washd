@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Bell, Check, KeyRound, LoaderCircle, LogOut, Mail, MapPin, Save, UserRound } from "lucide-react";
+import { Check, KeyRound, LoaderCircle, LogOut, Mail, MapPin, Save, UserRound } from "lucide-react";
 import { useAuth } from "../auth-provider";
 import { MemberHeader } from "../member-header";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
@@ -12,7 +12,6 @@ type Profile = {
   name?: string;
   email?: string;
   unit?: string;
-  notify_via?: string;
   pickup_location?: { label?: string; notes?: string };
 };
 
@@ -23,7 +22,6 @@ export default function ProfilePage() {
   const [name, setName] = useState("");
   const [residence, setResidence] = useState("");
   const [unit, setUnit] = useState("");
-  const [notifyVia, setNotifyVia] = useState("whatsapp");
   const [pageLoading, setPageLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [passwordBusy, setPasswordBusy] = useState(false);
@@ -33,14 +31,13 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!loading && !user) window.location.replace("/login?next=/profile");
     if (!user) return;
-    void supabase.from("profiles").select("member_id, name, email, unit, notify_via, pickup_location").eq("id", user.id).maybeSingle().then(({ data }) => {
+    void supabase.from("profiles").select("member_id, name, email, unit, pickup_location").eq("id", user.id).maybeSingle().then(({ data }) => {
       const next = (data || {}) as Profile;
       const location = next.pickup_location || {};
       setProfile(next);
       setName(next.name || user.user_metadata?.name || "");
       setResidence(location.label || "");
       setUnit(location.notes || next.unit?.split(" · ").at(-1) || "");
-      setNotifyVia(next.notify_via === "email" ? "email" : "whatsapp");
       setPageLoading(false);
     });
   }, [user, loading]);
@@ -56,12 +53,11 @@ export default function ProfilePage() {
       name: name.trim(),
       unit: pickupLabel,
       pickup_location: { label: residence.trim(), notes: unit.trim() },
-      notify_via: notifyVia,
       updated_at: new Date().toISOString(),
     }).eq("id", user.id);
     setSaving(false);
     if (updateError) { setError("We couldn’t save your profile. Please try again."); return; }
-    setProfile((current) => ({ ...current, name: name.trim(), unit: pickupLabel, pickup_location: { label: residence.trim(), notes: unit.trim() }, notify_via: notifyVia }));
+    setProfile((current) => ({ ...current, name: name.trim(), unit: pickupLabel, pickup_location: { label: residence.trim(), notes: unit.trim() } }));
     setNotice("Your member profile is updated.");
   }
 
@@ -82,7 +78,7 @@ export default function ProfilePage() {
     <MemberHeader />
     <div className="dashboard-bubbles profile-bubbles" aria-hidden="true"><i /><i /><i /><i /><i /></div>
     <section className="profile-hero">
-      <div><span className="kicker">Member profile</span><h1>Your Washd details.</h1><p>Keep your residence, collection details and contact preference up to date.</p></div>
+      <div><span className="kicker">Member profile</span><h1>Your Washd details.</h1><p>Keep your residence and collection details up to date.</p></div>
       <aside className="profile-member-id"><span>Washd member ID</span><strong>{profile.member_id || "Assigning…"}</strong><small>Use this ID whenever you contact our care team.</small></aside>
     </section>
     <section className="profile-layout">
@@ -91,12 +87,11 @@ export default function ProfilePage() {
         <label>Full name<input required minLength={2} autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} /></label>
         <label>Email address<input value={user.email || ""} readOnly aria-readonly="true" /><small>Email is managed securely through your Washd sign-in.</small></label>
         <div className="profile-field-row"><label>Residence<select required value={residence} onChange={(event) => setResidence(event.target.value)}><option value="" disabled>Select your residence</option>{content.residences.options.map((option) => <option value={option} key={option}>{option}</option>)}</select></label><label>Unit / apartment<input required value={unit} onChange={(event) => setUnit(event.target.value)} placeholder="e.g. Unit 12-3" /></label></div>
-        <label>Update preference<select value={notifyVia} onChange={(event) => setNotifyVia(event.target.value)}><option value="whatsapp">WhatsApp updates</option><option value="email">Email updates</option></select></label>
         {error && <div className="profile-alert error" role="alert">{error}</div>}{notice && <div className="profile-alert success"><Check size={17} /> {notice}</div>}
         <button className="button profile-save" type="submit" disabled={saving}>{saving ? <><LoaderCircle className="spin" size={17} /> Saving…</> : <><Save size={17} /> Save profile</>}</button>
       </form>
       <aside className="profile-side-stack">
-        <section className="profile-card profile-contact-card"><div className="profile-card-heading"><div className="profile-icon"><Bell size={22} /></div><div><span>Account preferences</span><h2>Your service updates</h2></div></div><p>We will send collection and return updates through your selected contact channel.</p><div className="profile-contact-detail"><MapPin size={17} /><span>{[residence, unit].filter(Boolean).join(" · ") || "Choose your residence"}</span></div><div className="profile-contact-detail"><Mail size={17} /><span>{user.email}</span></div></section>
+        <section className="profile-card profile-contact-card"><div className="profile-card-heading"><div className="profile-icon"><MapPin size={22} /></div><div><span>Account contact</span><h2>Your Washd details</h2></div></div><p>Keep these details accurate so our care team can identify your collection and assist you quickly.</p><div className="profile-contact-detail"><MapPin size={17} /><span>{[residence, unit].filter(Boolean).join(" · ") || "Choose your residence"}</span></div><div className="profile-contact-detail"><Mail size={17} /><span>{user.email}</span></div></section>
         <section className="profile-card profile-security-card"><div className="profile-card-heading"><div className="profile-icon"><KeyRound size={22} /></div><div><span>Security</span><h2>Password and sign-in</h2></div></div><p>For your safety, we’ll send a reset link to your registered email address.</p><button className="text-button" type="button" disabled={passwordBusy} onClick={() => void sendPasswordReset()}>{passwordBusy ? "Sending…" : "Change password"} <KeyRound size={15} /></button><button className="text-button logout-button" type="button" onClick={async () => { await supabase.auth.signOut(); window.location.assign("/"); }}><LogOut size={15} /> Log out</button></section>
       </aside>
     </section>

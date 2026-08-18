@@ -20,7 +20,7 @@ function PlanClauses({ detail }: { detail: SiteContent["planDetails"][string] | 
     <div className="plan-clauses-heading"><span className="kicker">Plan details</span><h2>Clear before your first collection.</h2><p>Everything this membership includes, plus the important care conditions.</p></div>
     <div className="plan-clauses-grid">
       <article><span>Included</span><ul>{detail.included.map((item) => <li key={item}><Check size={16} /> {item}</li>)}</ul></article>
-      <article className="plan-clauses-excluded"><span>Not included</span><ul>{detail.excluded.map((item) => <li key={item}>— {item}</li>)}</ul></article>
+      <article className="plan-clauses-excluded"><span>Not included</span><ul>{detail.excluded.map((item) => <li key={item}><X size={16} aria-hidden="true" /> {item}</li>)}</ul></article>
     </div>
     <div className="fabric-care-notice"><Droplets size={22} /><div><span>Colour &amp; fabric care</span><p>{detail.colourCare}</p></div></div>
     <p className="plan-detail-note"><strong>Please note:</strong> {detail.note}</p>
