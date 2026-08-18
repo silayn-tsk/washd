@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertCircle, ArrowLeft, ArrowRight, CalendarDays, Check, CircleDollarSign, Clock3, Droplets, LockKeyhole, MessageCircle, PackageCheck, Shirt, SlidersHorizontal, Sparkles, X } from "lucide-react";
+import { AlertCircle, ArrowLeft, ArrowRight, CalendarDays, Check, CircleDollarSign, Clock3, Droplets, LockKeyhole, MessageCircle, PackageCheck, SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { useAuth } from "../auth-provider";
 import Link from "next/link";
 import { MemberHeader } from "../member-header";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { useSiteContent } from "../use-site-content";
-import type { Plan, PlanAddon, SiteContent } from "@/lib/site-content";
+import type { Plan, SiteContent } from "@/lib/site-content";
 
 function WhatsAppRequest({ content, label = "Request on WhatsApp" }: { content: SiteContent; label?: string }) {
   const message = encodeURIComponent("Hi Washd, I would like to arrange a per-piece or special-care laundry item for my next collection.");
@@ -40,10 +40,8 @@ function AlaCarteServices({ content }: { content: SiteContent }) {
 
 export default function PlansPage() {
   const { user, loading: authLoading } = useAuth();
-  const { content, plans, addons, loading: contentLoading } = useSiteContent();
+  const { content, plans, loading: contentLoading } = useSiteContent();
   const [selectedPlanId, setSelectedPlanId] = useState("");
-  const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
-  const [previewAddon, setPreviewAddon] = useState<PlanAddon | null>(null);
   const [checkoutBusy, setCheckoutBusy] = useState(false);
   const [planChangeBusy, setPlanChangeBusy] = useState(false);
   const [membershipStatus, setMembershipStatus] = useState<string | null>(null);
@@ -80,13 +78,8 @@ export default function PlansPage() {
   }, [authLoading, user]);
 
   const selectedPlan = plans.find((plan) => plan.id === selectedPlanId);
-  const selectedAddonRows = addons.filter((addon) => selectedAddons.includes(addon.id));
-  const total = (selectedPlan?.price_rm || 0) + selectedAddonRows.reduce((sum, addon) => sum + addon.price_rm, 0);
+  const total = selectedPlan?.price_rm || 0;
   const hasCurrentSubscription = ["active", "trialing", "past_due", "unpaid", "paused"].includes(membershipStatus || "");
-
-  function toggleAddon(addon: PlanAddon) {
-    setSelectedAddons((current) => current.includes(addon.id) ? current.filter((id) => id !== addon.id) : [...current, addon.id]);
-  }
 
   function choosePlan(plan: Plan) {
     if (!user) {
@@ -95,7 +88,6 @@ export default function PlansPage() {
       return;
     }
     setSelectedPlanId(plan.id);
-    setSelectedAddons([]);
     setTermsAccepted(false);
     setError("");
     window.history.pushState({}, "", `/plans?plan=${encodeURIComponent(plan.id)}`);
@@ -118,7 +110,7 @@ export default function PlansPage() {
       const { data, error: checkoutError } = await supabase.functions.invoke<{ url: string }>("create-checkout-session", {
         body: {
           planId: selectedPlan.id,
-          addonIds: selectedAddons,
+          addonIds: [],
           termsAccepted: true,
           successUrl: `${origin}/account?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: `${origin}/plans?plan=${encodeURIComponent(selectedPlan.id)}&checkout=cancelled`,
@@ -192,7 +184,7 @@ export default function PlansPage() {
         <section className="plans-hero">
           <span className="kicker"><Sparkles size={14} /> {content.membership.eyebrow}</span>
           <h1>Choose your monthly<br /><em>laundry rhythm.</em></h1>
-          <p>Select a plan, log in, then review every detail and optional add-on before payment.</p>
+          <p>Select a plan, log in, then review every detail before payment.</p>
         </section>
         {status === "cancelled" && <div className="checkout-banner">Checkout was cancelled. No charge was made.</div>}
         <section className="membership-grid selection-grid">
@@ -213,7 +205,7 @@ export default function PlansPage() {
     <main className="member-page plan-detail-page">
       <MemberHeader />
       <section className="plan-detail-hero">
-        <button className="plan-back" type="button" onClick={() => { setSelectedPlanId(""); setSelectedAddons([]); setTermsAccepted(false); window.history.pushState({}, "", "/plans"); }}><ArrowLeft size={16} /> All plans</button>
+        <button className="plan-back" type="button" onClick={() => { setSelectedPlanId(""); setTermsAccepted(false); window.history.pushState({}, "", "/plans"); }}><ArrowLeft size={16} /> All plans</button>
         <div className="plan-detail-grid">
           <div>
             <span className="kicker">Your selected membership</span>
@@ -235,22 +227,6 @@ export default function PlansPage() {
 
       <PlanClauses detail={content.planDetails[selectedPlan.id]} />
 
-      <section className="addons-section">
-        <div className="addons-heading"><div><span className="kicker">Monthly plan add-ons</span><h2>Make the plan fit your month.</h2></div><p>These are recurring monthly additions. Select only what you need and see your total before payment.</p></div>
-        <div className="addons-grid">
-          {addons.map((addon, index) => {
-            const checked = selectedAddons.includes(addon.id);
-            return (
-              <button className={checked ? "addon-card selected" : "addon-card"} key={addon.id} type="button" onClick={() => setPreviewAddon(addon)} aria-label={`View ${addon.name}`}>
-                <span className="addon-icon">{index % 2 === 0 ? <Shirt size={21} /> : <PackageCheck size={21} />}</span>
-                <strong>{addon.name}</strong><p>{addon.description}</p>
-                <div><span>+ RM {addon.price_rm}</span><small>/ month</small><i>{checked ? <Check size={15} /> : "+"}</i></div>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
       <AlaCarteServices content={content} />
 
       <section className="other-plans-section">
@@ -265,28 +241,14 @@ export default function PlansPage() {
         <div>
           <span className="kicker">Final review</span><h2>Your Washd membership</h2>
           <div className="review-line"><span>{selectedPlan.name} plan</span><strong>RM {selectedPlan.price_rm}</strong></div>
-          {selectedAddonRows.map((addon) => <div className="review-line addon" key={addon.id}><span>{addon.name}</span><strong>RM {addon.price_rm}</strong></div>)}
           <div className="review-total"><span>Monthly total</span><strong>RM {total}</strong></div>
-          <small>Renews monthly. Cancel with two weeks’ notice. Add-ons renew with your selected plan.</small>
+          <small>Renews monthly. Cancel with two weeks’ notice.</small>
         </div>
         {hasCurrentSubscription ? <div className="payment-action"><PackageCheck size={24} /><h3>Ready to change?</h3><p>You selected the {selectedPlan.name} plan. Continue to Stripe to confirm your change securely.</p><button className="button wide gold-button" type="button" disabled={planChangeBusy} onClick={() => void openPlanManager()}>{planChangeBusy ? "Opening plan manager…" : "Continue to Stripe"} <ArrowRight size={18} /></button><small>Stripe will show the available Washd plans and confirm the change before anything is updated.</small></div> : <div className="payment-action"><LockKeyhole size={24} /><h3>Ready to subscribe?</h3><p>You’ll continue to Stripe to enter your card details securely.</p><label className="terms-acceptance"><input type="checkbox" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} /><span>I have reviewed and agree to the <Link href="/terms" target="_blank">Service Terms</Link> and <Link href="/service-information" target="_blank">Service Information</Link>.</span></label>{!termsAccepted && <small className="terms-required-hint">Tick the agreement above to unlock secure payment.</small>}<button className="button wide gold-button" type="button" disabled={checkoutBusy || !termsAccepted} onClick={() => void makePayment()}>{checkoutBusy ? "Opening secure payment…" : "Make payment"} <ArrowRight size={18} /></button><small>Washd never stores your complete card number.</small></div>}
       </section>
 
-      {previewAddon && <div className="addon-sheet-backdrop" role="presentation" onClick={() => setPreviewAddon(null)}>
-        <section className="addon-sheet" role="dialog" aria-modal="true" aria-labelledby="addon-sheet-title" onClick={(event) => event.stopPropagation()}>
-          <span className="addon-sheet-handle" />
-          <button className="addon-sheet-close" type="button" onClick={() => setPreviewAddon(null)} aria-label="Close add-on details"><X size={20} /></button>
-          <span className="kicker">Monthly plan add-on</span>
-          <span className="addon-icon"><PackageCheck size={22} /></span>
-          <h2 id="addon-sheet-title">{previewAddon.name}</h2>
-          <p>{previewAddon.description}</p>
-          <div className="addon-sheet-price"><span>+ RM {previewAddon.price_rm}</span><small>per month, added to your Washd plan</small></div>
-          <button className="button wide gold-button" type="button" onClick={() => { toggleAddon(previewAddon); setPreviewAddon(null); }}>{selectedAddons.includes(previewAddon.id) ? "Remove from plan" : "Add to my plan"} <ArrowRight size={18} /></button>
-        </section>
-      </div>}
-
       <button className="mobile-plan-bar" type="button" onClick={() => document.getElementById("payment-review")?.scrollIntoView({ behavior: "smooth", block: "start" })}>
-        <span><small>Your monthly plan</small><strong>RM {total}</strong></span><span>{selectedAddons.length ? `${selectedAddons.length} add-on${selectedAddons.length === 1 ? "" : "s"}` : "Review plan"} <ArrowRight size={17} /></span>
+        <span><small>Your monthly plan</small><strong>RM {total}</strong></span><span>Review plan <ArrowRight size={17} /></span>
       </button>
 
       {error && <div className="checkout-error-popover" role="alert" aria-live="assertive">
