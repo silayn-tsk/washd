@@ -59,6 +59,14 @@ export default function PlansPage() {
   }, []);
 
   useEffect(() => {
+    const result = new URLSearchParams(window.location.search).get("checkout");
+    if (authLoading || !user || result !== "cancelled" || !isSupabaseConfigured) return;
+    // Leaving Stripe Checkout does not create a subscription. Clear the local
+    // pending selection straight away so a later attempt is a fresh checkout.
+    void supabase.functions.invoke("clear-cancelled-checkout", { body: {} });
+  }, [authLoading, user]);
+
+  useEffect(() => {
     if (authLoading || user || !selectedPlanId) return;
     const next = `/plans?plan=${encodeURIComponent(selectedPlanId)}`;
     window.location.replace(`/login?next=${encodeURIComponent(next)}`);
