@@ -27,12 +27,9 @@ const plans = [
   { id: "executive", name: "Executive", description: "7kg bag + 7 pressed shirts, once a week", priceRM: 299, popular: false, features: ["7kg wash-fold bag", "7 pressed shirts", "Once a week"] },
 ];
 
-const addons = [
-  { id: "extra-shirts", name: "4 extra pressed shirts", description: "Four additional shirts washed, pressed and returned on hangers each month.", priceRM: 30 },
-  { id: "extra-bag", name: "One extra 5kg bag", description: "Add one extra wash, dry and fold bag to your monthly allowance.", priceRM: 18 },
-  { id: "fragrance-free", name: "Fragrance-free care", description: "A fragrance-free detergent preference for every bag in your membership.", priceRM: 12 },
-  { id: "priority-return", name: "Priority 24-hour return", description: "Move one collection each month to our priority 24-hour return service.", priceRM: 35 },
-];
+// Recurring add-ons were deliberately removed from the Washd customer journey.
+// Keep this empty so a production setup never recreates them.
+const addons = [];
 
 const stripe = new Stripe(stripeSecretKey);
 const supabase = createClient(supabaseUrl, serviceRoleKey, {
@@ -41,6 +38,7 @@ const supabase = createClient(supabaseUrl, serviceRoleKey, {
 
 const products = await stripe.products.list({ active: true, limit: 100 });
 const configuredPlans = [];
+const portalProducts = [];
 
 for (const plan of plans) {
   let product = products.data.find((candidate) => candidate.metadata.washd_plan_id === plan.id);
@@ -80,6 +78,7 @@ for (const plan of plans) {
     sort_order: plans.findIndex((candidate) => candidate.id === plan.id) + 1,
     updated_at: new Date().toISOString(),
   });
+  portalProducts.push({ product: product.id, prices: [price.id] });
 }
 
 const configuredAddons = [];
@@ -117,19 +116,30 @@ for (const [index, addon] of addons.entries()) {
 
 const portalConfigurations = await stripe.billingPortal.configurations.list({ active: true, limit: 100 });
 let portal = portalConfigurations.data.find((configuration) => configuration.metadata?.washd_app === "true");
-if (!portal) {
-  portal = await stripe.billingPortal.configurations.create({
-    business_profile: { headline: "Manage your Washd laundry membership" },
-    default_return_url: `${appBaseUrl}/account`,
-    features: {
-      customer_update: { enabled: true, allowed_updates: ["email"] },
-      invoice_history: { enabled: true },
-      payment_method_update: { enabled: true },
-      subscription_cancel: { enabled: true, mode: "at_period_end", proration_behavior: "none" },
+const portalSettings = {
+  business_profile: {
+    headline: "Manage your Washd laundry membership",
+    privacy_policy_url: `${appBaseUrl}/privacy`,
+    terms_of_service_url: `${appBaseUrl}/terms`,
+  },
+  default_return_url: `${appBaseUrl}/account`,
+  features: {
+    customer_update: { enabled: true, allowed_updates: ["email", "name", "phone", "address"] },
+    invoice_history: { enabled: true },
+    payment_method_update: { enabled: true },
+    subscription_cancel: { enabled: true, mode: "at_period_end", proration_behavior: "none" },
+    subscription_update: {
+      enabled: true,
+      default_allowed_updates: ["price"],
+      products: portalProducts,
+      proration_behavior: "none",
     },
-    metadata: { washd_app: "true" },
-  });
-}
+  },
+};
+
+portal = portal
+  ? await stripe.billingPortal.configurations.update(portal.id, portalSettings)
+  : await stripe.billingPortal.configurations.create({ ...portalSettings, metadata: { washd_app: "true" } });
 
 const enabledEvents = [
   "checkout.session.completed",
@@ -177,5 +187,11 @@ if (planError) throw planError;
 
 const { error: addonError } = await supabase.from("plan_addons").upsert(configuredAddons, { onConflict: "id" });
 if (addonError) throw addonError;
+
+const { error: disableAddonsError } = await supabase
+  .from("plan_addons")
+  .update({ active: false, updated_at: new Date().toISOString() })
+  .eq("active", true);
+if (disableAddonsError) throw disableAddonsError;
 
 console.log(`Configured four Stripe ${stripeSecretKey.startsWith("sk_live_") ? "live" : "test"} subscriptions, four add-ons, the billing portal, and the signed Washd webhook.`);
