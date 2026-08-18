@@ -1358,6 +1358,22 @@ h1 em, h2 em { color: #4f83ed; font-weight: 390; }
 .dashboard-card:hover::after { scale: 1.35; }
 .dashboard-card-icon { border-radius: 18px 18px 34px 18px; }
 .dashboard-card .text-button { position: relative; z-index: 2; }
+.pickup-day-options { position: relative; z-index: 2; display: flex; gap: 9px; margin-top: auto; }
+.pickup-day-options button { min-width: 104px; padding: 12px 15px; border: 1px solid rgba(26,122,140,.22); border-radius: 999px; color: #082c34; background: #f2f7f6; font: 700 12px/1 var(--font-montserrat), Arial, sans-serif; cursor: pointer; transition: background .2s ease, color .2s ease, translate .2s ease; }
+.pickup-day-options button:hover { color: #fff; background: #0b3942; translate: 0 -2px; }
+.pickup-day-card .text-button { margin-top: auto; }
+.pickup-day-modal-backdrop { position: fixed; z-index: 90; inset: 0; display: grid; place-items: center; padding: 24px; background: rgba(4,27,32,.62); backdrop-filter: blur(8px); animation: fade-in .2s ease both; }
+.pickup-day-modal { width: min(510px, 100%); position: relative; padding: 42px; overflow: hidden; border-radius: 30px 78px 30px 30px; color: #082c34; background: #fbfcfa; box-shadow: 0 28px 90px rgba(0,0,0,.3); animation: dashboard-rise .3s cubic-bezier(.16,1,.3,1) both; }
+.pickup-day-modal::after { content: ""; width: 190px; height: 190px; position: absolute; top: -90px; right: -100px; border-radius: 50%; background: rgba(201,168,106,.14); }
+.pickup-day-modal > * { position: relative; z-index: 1; }
+.pickup-day-modal > svg { width: 50px; height: 50px; margin: 21px 0 18px; padding: 13px; border-radius: 18px 18px 32px 18px; color: #1A7A8C; background: #edf5f4; }
+.pickup-day-modal h2 { margin: 0; font: 650 clamp(30px,6vw,42px)/1.05 var(--font-montserrat), Arial, sans-serif; }
+.pickup-day-modal p { max-width: 410px; margin: 15px 0 18px; color: #597075; font-size: 15px; line-height: 1.55; }
+.pickup-day-modal-note { padding: 14px 16px; border-left: 3px solid #C9A86A; color: #496167; background: #f4f1e9; font-size: 12px; line-height: 1.5; }
+.pickup-day-modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 26px; }
+.pickup-day-modal-actions > button:not(.button) { padding: 12px 16px; border: 0; border-radius: 999px; color: #486167; background: transparent; font-weight: 700; cursor: pointer; }
+.pickup-day-modal-actions .button { min-width: 190px; justify-content: center; }
+.pickup-day-modal-close { width: 36px; height: 36px; position: absolute; z-index: 2; top: 16px; right: 16px; display: grid; place-items: center; border: 0; border-radius: 50%; color: #486167; background: rgba(6,35,42,.06); cursor: pointer; }
 .dashboard-help {
   width: min(1180px, calc(100% - 56px));
   max-width: none;
@@ -1514,6 +1530,9 @@ h1 em, h2 em { color: #4f83ed; font-weight: 390; }
   .dashboard-help { width: calc(100% - 24px); }
   .dashboard-card:nth-child(n) { min-height: 235px; padding: 27px; border-radius: 26px 62px 26px 26px; }
   .dashboard-card:nth-child(even) { border-radius: 62px 26px 26px 26px; }
+  .pickup-day-modal { padding: 34px 25px 26px; border-radius: 25px 60px 25px 25px; }
+  .pickup-day-modal-actions { align-items: stretch; flex-direction: column-reverse; }
+  .pickup-day-modal-actions .button { width: 100%; min-width: 0; }
   .dashboard-help { margin-bottom: 40px; padding: 24px; border-radius: 25px 55px 25px 25px; }
   .admin-brand small { display: none; }
   .admin-save { padding: 11px 13px; font-size: 10px; }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowRight, CalendarDays, Check, Clock3, Copy, CreditCard, LogOut, MapPin, PackageCheck, RefreshCw, Shirt, Sparkles, Truck, UserRound } from "lucide-react";
+import { ArrowRight, CalendarDays, Check, Clock3, Copy, CreditCard, LogOut, MapPin, PackageCheck, RefreshCw, Shirt, Sparkles, Truck, UserRound, X } from "lucide-react";
 import { useAuth } from "../auth-provider";
 import { MemberHeader } from "../member-header";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
@@ -17,6 +17,7 @@ type Profile = {
   payment_last4?: string;
   unit?: string;
   current_period_end?: string;
+  pickup_location?: { label?: string; notes?: string; weeklyPickupDay?: string };
 };
 type BagEvent = { status?: string; label?: string; at?: string };
 type Bag = { id: string; status: string; cycle_started_at?: string; events?: BagEvent[]; updated_at?: string };
@@ -38,13 +39,16 @@ function trackingIndex(status?: string) {
   return -1;
 }
 
-function nextFixedDrop() {
+type PickupDay = "monday" | "wednesday";
+
+function nextFixedDrop(pickupDay?: PickupDay) {
   const date = new Date();
   for (let days = 0; days < 8; days += 1) {
     const candidate = new Date(date);
     candidate.setDate(date.getDate() + days);
     candidate.setHours(9, 30, 0, 0);
-    if ([1, 3].includes(candidate.getDay()) && candidate > date) return candidate;
+    const allowedDay = pickupDay === "monday" ? 1 : pickupDay === "wednesday" ? 3 : undefined;
+    if ((allowedDay ? candidate.getDay() === allowedDay : [1, 3].includes(candidate.getDay())) && candidate > date) return candidate;
   }
   return date;
 }
@@ -64,11 +68,13 @@ export default function AccountPage() {
   const [error, setError] = useState("");
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
   const [memberIdCopied, setMemberIdCopied] = useState(false);
+  const [pickupDayChoice, setPickupDayChoice] = useState<PickupDay | null>(null);
+  const [pickupDayBusy, setPickupDayBusy] = useState(false);
 
   const loadDashboard = useCallback(async () => {
     if (!user) return;
     const [profileResult, bagResult, collectionResult] = await Promise.all([
-      supabase.from("profiles").select("name, member_id, plan_id, active_addons, subscription_status, payment_brand, payment_last4, unit, current_period_end").eq("id", user.id).maybeSingle(),
+      supabase.from("profiles").select("name, member_id, plan_id, active_addons, subscription_status, payment_brand, payment_last4, unit, current_period_end, pickup_location").eq("id", user.id).maybeSingle(),
       supabase.from("bags").select("id, status, cycle_started_at, events, updated_at").eq("user_id", user.id).order("cycle_started_at", { ascending: false }).limit(1).maybeSingle(),
       supabase.from("collections").select("id, type, due, location, status").eq("user_id", user.id).gte("due", new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()).order("due").limit(1).maybeSingle(),
     ]);
@@ -114,7 +120,10 @@ export default function AccountPage() {
   const plan = plans.find((candidate) => candidate.id === profile.plan_id);
   const planName = plan?.name || profile.plan_id?.replaceAll("-", " ") || "No active plan";
   const activeAddonRows = addons.filter((addon) => profile.active_addons?.includes(addon.id));
-  const nextDrop = useMemo(() => nextFixedDrop(), []);
+  const weeklyPickupDay = profile.pickup_location?.weeklyPickupDay === "monday" || profile.pickup_location?.weeklyPickupDay === "wednesday"
+    ? profile.pickup_location.weeklyPickupDay
+    : undefined;
+  const nextDrop = useMemo(() => nextFixedDrop(weeklyPickupDay), [weeklyPickupDay]);
   const nextDue = collection?.due || nextDrop;
   const latestEvent = bag?.events?.at(-1);
   const lastUpdated = bag?.updated_at || latestEvent?.at;
@@ -125,6 +134,24 @@ export default function AccountPage() {
     await navigator.clipboard.writeText(profile.member_id);
     setMemberIdCopied(true);
     window.setTimeout(() => setMemberIdCopied(false), 1800);
+  }
+
+  async function confirmPickupDay() {
+    if (!user || !pickupDayChoice) return;
+    setPickupDayBusy(true);
+    setError("");
+    const pickupLocation = typeof profile.pickup_location === "object" && profile.pickup_location ? profile.pickup_location : {};
+    const { error: updateError } = await supabase.from("profiles").update({
+      pickup_location: { ...pickupLocation, weeklyPickupDay: pickupDayChoice },
+      updated_at: new Date().toISOString(),
+    }).eq("id", user.id);
+    if (updateError) {
+      setError("We couldn’t save your weekly pickup day. Please try again or contact Washd on WhatsApp.");
+    } else {
+      setProfile((current) => ({ ...current, pickup_location: { ...pickupLocation, weeklyPickupDay: pickupDayChoice } }));
+      setPickupDayChoice(null);
+    }
+    setPickupDayBusy(false);
   }
 
   if (loading || !user) return <main className="member-page"><MemberHeader /><div className="account-loading">Loading your Washd dashboard…</div></main>;
@@ -157,12 +184,24 @@ export default function AccountPage() {
 
       <section className="dashboard-grid">
         <article className="dashboard-card collection-card"><div className="dashboard-card-icon"><CalendarDays size={22} /></div><span>Next collection</span><h3>{formatDate(nextDue)}</h3><p><Clock3 size={15} /> {collection ? formatDate(collection.due, { hour: "numeric", minute: "2-digit" }) : "Drop by 9:30am"}</p><p><MapPin size={15} /> {collection?.location || profile.unit || "Residence lobby"}</p><small>{collection ? collection.status : "Fixed weekly route"}</small></article>
+        <article className="dashboard-card pickup-day-card"><div className="dashboard-card-icon"><CalendarDays size={22} /></div><span>Weekly pickup day</span>{weeklyPickupDay ? <><h3>Every {weeklyPickupDay === "monday" ? "Monday" : "Wednesday"}</h3><p>Your weekly Washd collection follows this fixed route.</p><p><Clock3 size={15} /> Drop by 9:30am</p><a className="text-button" href={`https://wa.me/60176494749?text=${encodeURIComponent("Hi Washd, I would like to request a change to my weekly pickup day.")}`} target="_blank" rel="noreferrer">Request a change on WhatsApp <ArrowRight size={16} /></a></> : <><h3>Choose your day</h3><p>Select one fixed weekly collection day. It cannot be changed online later.</p><div className="pickup-day-options"><button type="button" onClick={() => setPickupDayChoice("monday")}>Monday</button><button type="button" onClick={() => setPickupDayChoice("wednesday")}>Wednesday</button></div></>}</article>
         <article className="dashboard-card plan-dashboard-card"><div className="dashboard-card-icon"><PackageCheck size={22} /></div><span>Current membership</span><h3>{planName}</h3><p>{plan?.description || (profile.plan_id ? "Your active Washd membership" : "Choose a plan to begin weekly collections.")}</p>{activeAddonRows.length > 0 && <div className="active-addons">{activeAddonRows.map((addon) => <span key={addon.id}><Shirt size={13} /> {addon.name}</span>)}</div>}<a className="text-button" href="/plans">{profile.plan_id ? "View or change plan" : "Choose a plan"} <ArrowRight size={16} /></a></article>
         <article className="dashboard-card"><div className="dashboard-card-icon"><CreditCard size={22} /></div><span>Billing</span><h3>{profile.payment_last4 ? `${profile.payment_brand || "Card"} •••• ${profile.payment_last4}` : "No payment method"}</h3><p>{profile.current_period_end ? `Next renewal ${formatDate(profile.current_period_end)}` : "Your card details are entered only on secure checkout."}</p><button className="text-button" type="button" disabled={billingBusy || !profile.payment_last4} onClick={() => void manageBilling()}>{billingBusy ? "Opening…" : profile.payment_last4 ? "Manage billing" : "Available after payment"} {profile.payment_last4 && <ArrowRight size={16} />}</button></article>
         <article className="dashboard-card"><div className="dashboard-card-icon"><UserRound size={22} /></div><span>Member profile</span><h3>{profile.name || user.user_metadata?.name || "Washd member"}</h3><p>{user.email}</p><p>{profile.unit || "Residence lobby"}</p><button className="text-button logout-button" type="button" onClick={async () => { await supabase.auth.signOut(); window.location.assign("/"); }}><LogOut size={15} /> Log out</button></article>
       </section>
 
       <section className="dashboard-help"><Sparkles size={22} /><div><span>Need help with a collection?</span><p>Share your member ID and bag number with the Washd team for the fastest assistance.</p></div><a href="https://wa.me/60176494749" target="_blank" rel="noreferrer">Message Washd <ArrowRight size={16} /></a></section>
+      {pickupDayChoice && <div className="pickup-day-modal-backdrop" role="presentation" onClick={() => !pickupDayBusy && setPickupDayChoice(null)}>
+        <section className="pickup-day-modal" role="dialog" aria-modal="true" aria-labelledby="pickup-day-title" onClick={(event) => event.stopPropagation()}>
+          <button className="pickup-day-modal-close" type="button" onClick={() => setPickupDayChoice(null)} disabled={pickupDayBusy} aria-label="Close pickup-day confirmation"><X size={20} /></button>
+          <span className="kicker">Confirm weekly pickup day</span>
+          <CalendarDays size={30} />
+          <h2 id="pickup-day-title">Every {pickupDayChoice === "monday" ? "Monday" : "Wednesday"}</h2>
+          <p>This will be your weekly laundry pickup date. Your collection will follow this same day every week.</p>
+          <div className="pickup-day-modal-note">If you need to change your pickup day later, please contact Washd on WhatsApp.</div>
+          <div className="pickup-day-modal-actions"><button type="button" onClick={() => setPickupDayChoice(null)} disabled={pickupDayBusy}>Back</button><button className="button gold-button" type="button" onClick={() => void confirmPickupDay()} disabled={pickupDayBusy}>{pickupDayBusy ? "Saving…" : `Confirm ${pickupDayChoice === "monday" ? "Monday" : "Wednesday"}`} <ArrowRight size={17} /></button></div>
+        </section>
+      </div>}
     </main>
   );
 }
