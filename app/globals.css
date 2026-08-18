@@ -1285,6 +1285,17 @@ h1 em, h2 em { color: #4f83ed; font-weight: 390; }
   background: rgba(247,249,246,.83);
   box-shadow: 0 12px 38px rgba(6,35,42,.055);
 }
+.plans-page .member-header,
+.plan-detail-page .member-header {
+  height: 82px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  border-color: rgba(6,35,42,.08);
+  background: rgba(247,249,246,.9);
+  box-shadow: 0 12px 38px rgba(6,35,42,.055);
+  backdrop-filter: blur(14px);
+}
 .dashboard-page .member-header .brand { font: 700 27px/1 var(--font-montserrat), Arial, sans-serif; letter-spacing: -.045em; }
 .dashboard-page .member-header nav > a:not(.member-pill) { color: #536a6f; transition: color .25s ease; }
 .dashboard-page .member-header nav > a:not(.member-pill):hover { color: #0b5663; }
@@ -1608,6 +1619,8 @@ h1 em, h2 em { color: #4f83ed; font-weight: 390; }
   .dashboard-bubbles i:nth-child(4) { width: 42px; left: 84%; }
   .dashboard-bubbles i:nth-child(5) { width: 26px; left: 18%; }
   .dashboard-page .member-header { height: 72px; }
+  .plans-page .member-header,
+  .plan-detail-page .member-header { height: 72px; }
   .dashboard-page .member-header nav { gap: 11px; }
   .dashboard-page .member-header nav > a:not(.member-pill) { display: inline-flex; }
   .dashboard-title { width: calc(100% - 28px); padding: 46px 0 28px; gap: 30px; }
