@@ -36,11 +36,12 @@ export default function ProfilePage() {
       const location = next.pickup_location || {};
       setProfile(next);
       setName(next.name || user.user_metadata?.name || "");
-      setResidence(location.label || "");
+      const savedResidence = location.label || "";
+      setResidence(content.residences.options.includes(savedResidence) ? savedResidence : "");
       setUnit(location.notes || next.unit?.split(" · ").at(-1) || "");
       setPageLoading(false);
     });
-  }, [user, loading]);
+  }, [user, loading, content.residences.options]);
 
   async function saveProfile(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -86,7 +87,7 @@ export default function ProfilePage() {
         <div className="profile-card-heading"><div className="profile-icon"><UserRound size={22} /></div><div><span>Personal details</span><h2>Profile information</h2></div></div>
         <label>Full name<input required minLength={2} autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} /></label>
         <label>Email address<input value={user.email || ""} readOnly aria-readonly="true" /><small>Email is managed securely through your Washd sign-in.</small></label>
-        <div className="profile-field-row"><label>Residence<select required value={residence} onChange={(event) => setResidence(event.target.value)}><option value="" disabled>Select your residence</option>{content.residences.options.map((option) => <option value={option} key={option}>{option}</option>)}</select></label><label>Unit / apartment<input required value={unit} onChange={(event) => setUnit(event.target.value)} placeholder="e.g. Unit 12-3" /></label></div>
+        <div className="profile-field-row"><label>Residence<select required value={residence} onChange={(event) => setResidence(event.target.value)}><option value="" disabled>Select your residence</option>{content.residences.options.map((option) => <option value={option} key={option}>{option}</option>)}</select><small>Select an approved Washd residence, then save your profile.</small></label><label>Unit / apartment<input required value={unit} onChange={(event) => setUnit(event.target.value)} placeholder="e.g. Unit 12-3" /></label></div>
         {error && <div className="profile-alert error" role="alert">{error}</div>}{notice && <div className="profile-alert success"><Check size={17} /> {notice}</div>}
         <button className="button profile-save" type="submit" disabled={saving}>{saving ? <><LoaderCircle className="spin" size={17} /> Saving…</> : <><Save size={17} /> Save profile</>}</button>
       </form>
