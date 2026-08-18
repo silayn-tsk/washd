@@ -26,6 +26,7 @@ const sectionLabels: Record<string, string> = {
   safety: "Safety promise",
   benefits: "Member benefits",
   building: "Building partners",
+  residences: "Approved residences",
   faq: "Frequently asked questions",
   enquiry: "Custom-plan enquiry",
   finalCta: "Final call to action",
@@ -72,6 +73,26 @@ function ContentFields({ value, path, onChange }: { value: EditableValue; path: 
   const text = String(value ?? "");
   const multiline = text.length > 64 || ["body", "intro", "footer"].includes(key);
   return <label className={multiline ? "admin-field full" : "admin-field"} data-field={key}><span>{label}</span>{multiline ? <textarea value={text} onChange={(event) => onChange(path, event.target.value)} /> : <input value={text} onChange={(event) => onChange(path, event.target.value)} />}</label>;
+}
+
+function ResidencesEditor({ residences, onChange }: { residences: SiteContent["residences"]; onChange: (path: PathPart[], value: EditableValue) => void }) {
+  const [newResidence, setNewResidence] = useState("");
+  const addResidence = () => {
+    const name = newResidence.trim();
+    if (!name || residences.options.some((option) => option.toLocaleLowerCase() === name.toLocaleLowerCase())) return;
+    onChange(["residences", "options"], [...residences.options, name]);
+    setNewResidence("");
+  };
+  return <div className="admin-section-card residences-editor">
+    <div className="admin-policy-guidance"><BookOpenText size={19} /><div><strong>Signup residence dropdown</strong><p>Only residences listed here can be selected by new members when they create a Washd account.</p></div></div>
+    <div className="admin-fields">
+      <label className="admin-field"><span>Section title</span><input value={residences.title} onChange={(event) => onChange(["residences", "title"], event.target.value)} /></label>
+      <label className="admin-field full"><span>Admin helper text</span><input value={residences.helper} onChange={(event) => onChange(["residences", "helper"], event.target.value)} /></label>
+    </div>
+    <div className="admin-residence-list">{residences.options.map((residence, index) => <div key={`${residence}-${index}`}><span>{index + 1}</span><input value={residence} onChange={(event) => onChange(["residences", "options"], residences.options.map((option, optionIndex) => optionIndex === index ? event.target.value : option))} aria-label={`Residence ${index + 1}`} /><button type="button" disabled={residences.options.length === 1} onClick={() => onChange(["residences", "options"], residences.options.filter((_, optionIndex) => optionIndex !== index))} aria-label={`Remove ${residence}`}><Trash2 size={16} /> Remove</button></div>)}</div>
+    <div className="admin-residence-add"><input value={newResidence} onChange={(event) => setNewResidence(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); addResidence(); } }} placeholder="e.g. Residensi Example" /><button type="button" onClick={addResidence}><Plus size={16} /> Add residence</button></div>
+    <small>Save all changes to publish the updated dropdown on the Create Account page.</small>
+  </div>;
 }
 
 function PolicyEditor({ policy, policyKey, onChange }: { policy: PolicyPageContent; policyKey: keyof SiteContent["policies"]; onChange: (path: PathPart[], value: EditableValue) => void }) {
@@ -223,6 +244,8 @@ export default function AdminPage() {
           <div className="admin-panel-transition" key={activeSection}>
           {activePolicyKey ? (
             <PolicyEditor policy={content.policies[activePolicyKey]} policyKey={activePolicyKey} onChange={updateContent} />
+          ) : activeSection === "residences" ? (
+            <ResidencesEditor residences={content.residences} onChange={updateContent} />
           ) : activeSection === "plans" ? (
             <div className="admin-plan-list">
               {plans.map((plan, index) => (

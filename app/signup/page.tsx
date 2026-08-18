@@ -5,6 +5,7 @@ import { ArrowRight, Check, Eye, EyeOff, FileText, X } from "lucide-react";
 import Link from "next/link";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { TurnstileWidget, turnstileSiteKey } from "../turnstile-widget";
+import { useSiteContent } from "../use-site-content";
 
 const TERMS_VERSION = "2026-08-12";
 
@@ -29,6 +30,7 @@ const serviceTerms = [
 
 export default function SignupPage() {
   const [name, setName] = useState("");
+  const [residence, setResidence] = useState("");
   const [unit, setUnit] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,6 +41,7 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [captchaToken, setCaptchaToken] = useState("");
   const [captchaReset, setCaptchaReset] = useState(0);
+  const { content } = useSiteContent();
   const handleCaptcha = useCallback((token: string) => setCaptchaToken(token), []);
 
   function reviewTerms(event: React.FormEvent<HTMLFormElement>) {
@@ -54,10 +57,10 @@ export default function SignupPage() {
     try {
       if (!isSupabaseConfigured) throw new Error("Supabase is not configured");
       if (turnstileSiteKey && !captchaToken) throw new Error("CAPTCHA_REQUIRED");
-      const pickupLabel = unit.trim() || "Residence lobby";
+      const pickupLabel = [residence.trim(), unit.trim()].filter(Boolean).join(" · ");
       const { data, error: signupError } = await supabase.auth.signUp({
         email: email.trim(), password,
-        options: { emailRedirectTo: `${window.location.origin}/plans`, captchaToken: captchaToken || undefined, data: { name: name.trim(), unit: pickupLabel, pickup_location: { label: pickupLabel, notes: "" }, terms_accepted: true, terms_version: TERMS_VERSION } },
+        options: { emailRedirectTo: `${window.location.origin}/plans`, captchaToken: captchaToken || undefined, data: { name: name.trim(), unit: pickupLabel, pickup_location: { label: residence.trim(), notes: unit.trim() }, terms_accepted: true, terms_version: TERMS_VERSION } },
       });
       if (signupError) throw signupError;
       window.location.assign(data.session ? "/plans" : "/login?signup=check-email");
@@ -74,7 +77,8 @@ export default function SignupPage() {
       <div className="signup-intro"><span className="signup-glow signup-glow-one" /><span className="signup-glow signup-glow-two" /><span className="kicker">Join Washd</span><h1>A fresher weekly rhythm starts here.</h1><p>Create your account now. You can choose a plan after signing up.</p><ul><li><Check size={16} /> Track every Washd bag</li><li><Check size={16} /> Manage pickups in one place</li><li><Check size={16} /> Secure Stripe-hosted payments</li></ul></div>
       <form onSubmit={reviewTerms}>
         <label>Full name<input required minLength={2} autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} placeholder="Your name" /></label>
-        <label>Residence / unit<input autoComplete="street-address" value={unit} onChange={(event) => setUnit(event.target.value)} placeholder="e.g. The Residence · Unit 12-3" /></label>
+        <label>Residence<select required value={residence} onChange={(event) => setResidence(event.target.value)}><option value="" disabled>Select your residence</option>{content.residences.options.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
+        <label>Unit / apartment number<input required autoComplete="street-address" value={unit} onChange={(event) => setUnit(event.target.value)} placeholder="e.g. Unit 12-3" /></label>
         <label>Email<input required type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" /></label>
         <label>Password<span className="password-field"><input required minLength={10} type={showPassword ? "text" : "password"} autoComplete="new-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="At least 10 characters" /><button type="button" aria-label={showPassword ? "Hide password" : "Show password"} onClick={() => setShowPassword((value) => !value)}>{showPassword ? <EyeOff size={19} /> : <Eye size={19} />}</button></span></label>
         <TurnstileWidget action="signup" onToken={handleCaptcha} resetSignal={captchaReset} />

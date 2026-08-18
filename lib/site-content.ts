@@ -114,6 +114,11 @@ export type SiteContent = {
     points: string[];
     cta: string;
   };
+  residences: {
+    title: string;
+    helper: string;
+    options: string[];
+  };
   faq: {
     eyebrow: string;
     title: string;
@@ -333,6 +338,11 @@ export const defaultSiteContent: SiteContent = {
     body: "Fixed routes make collection simple for residents and efficient for management teams.",
     points: ["A single collection point", "Predictable fixed days", "No rider traffic throughout the week", "A dedicated Washd contact"],
     cta: "Bring Washd to your building",
+  },
+  residences: {
+    title: "Approved residences",
+    helper: "Members can create an account only for a currently active Washd residence.",
+    options: ["Residensi Astrea"],
   },
   faq: {
     eyebrow: "Questions, answered",

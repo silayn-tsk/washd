@@ -379,8 +379,8 @@ h1 em, h2 em { color: #4f83ed; font-weight: 390; }
 .auth-form-card > p { color: #74868b; line-height: 1.6; margin: 0 0 29px; }
 .auth-form-card form, .signup-card form { display: grid; gap: 17px; }
 .auth-form-card label, .signup-card label { display: flex; flex-direction: column; gap: 8px; font-size: 11px; font-weight: 680; }
-.auth-form-card input, .signup-card input { width: 100%; border: 1px solid var(--line); border-radius: 12px; background: white; padding: 15px; outline: none; color: var(--ink); }
-.auth-form-card input:focus, .signup-card input:focus { border-color: #7798a0; box-shadow: 0 0 0 3px rgba(23,53,61,.08); }
+.auth-form-card input, .signup-card input, .signup-card select { width: 100%; border: 1px solid var(--line); border-radius: 12px; background: white; padding: 15px; outline: none; color: var(--ink); }
+.auth-form-card input:focus, .signup-card input:focus, .signup-card select:focus { border-color: #7798a0; box-shadow: 0 0 0 3px rgba(23,53,61,.08); }
 .password-field { position: relative; display: block; }
 .password-field input { padding-right: 50px; }
 .password-field button { position: absolute; right: 7px; top: 50%; transform: translateY(-50%); width: 38px; height: 38px; display: grid; place-items: center; border: 0; background: transparent; cursor: pointer; color: #61767c; }
@@ -422,8 +422,8 @@ h1 em, h2 em { color: #4f83ed; font-weight: 390; }
 .signup-card form::before { content: "Create your account"; margin-bottom: 3px; color: #123f4b; font: 600 clamp(25px,3vw,36px)/1 var(--font-montserrat),Arial,sans-serif; letter-spacing: -.045em; }
 .signup-card form::after { content: "Your weekly laundry rhythm starts in a few simple steps."; order: 0; margin-top: -9px; margin-bottom: 10px; color: #71858a; font-size: 12px; line-height: 1.5; }
 .signup-card form > label, .signup-card form > .turnstile-widget, .signup-card form > .form-alert, .signup-card form > .button, .signup-card form > .form-foot { position: relative; z-index: 1; }
-.signup-card input { background: rgba(255,255,255,.96) !important; border-color: #d7e4e8 !important; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
-.signup-card input:focus { border-color: #4b9ab4 !important; box-shadow: 0 0 0 4px rgba(63,154,183,.14) !important; transform: translateY(-1px); }
+.signup-card input, .signup-card select { background: rgba(255,255,255,.96) !important; border-color: #d7e4e8 !important; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+.signup-card input:focus, .signup-card select:focus { border-color: #4b9ab4 !important; box-shadow: 0 0 0 4px rgba(63,154,183,.14) !important; transform: translateY(-1px); }
 .signup-card .gold-button { background: linear-gradient(100deg,#d6af63,#f0ca7a); border: 0; }
 .signup-card .gold-button:hover { background: #0b5064; }
 .form-foot { text-align: center; color: #71858a; font-size: 11px; }
@@ -1475,6 +1475,15 @@ h1 em, h2 em { color: #4f83ed; font-weight: 390; }
 .admin-policy-guidance strong { font-size: 12px; }
 .admin-policy-guidance p { margin: 5px 0 0; color: #61777b; font-size: 10px; line-height: 1.6; }
 .admin-policy-guidance code { padding: 2px 5px; border-radius: 5px; color: #0A2E36; background: rgba(255,255,255,.7); }
+.admin-residence-list { display: grid; gap: 9px; margin: 24px 0 14px; }
+.admin-residence-list > div { display: grid; grid-template-columns: 32px 1fr auto; gap: 10px; align-items: center; }
+.admin-residence-list > div > span { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; color: #1A7A8C; background: #edf5f4; font-size: 10px; font-weight: 800; }
+.admin-residence-list input, .admin-residence-add input { width: 100%; min-width: 0; padding: 12px 13px; border: 1px solid #dce4e1; border-radius: 11px; color: #17353d; background: #fff; outline: none; }
+.admin-residence-list button { display: inline-flex; align-items: center; gap: 6px; padding: 10px 12px; border: 0; border-radius: 999px; color: #8a4b4b; background: #faeeee; font-size: 10px; font-weight: 750; cursor: pointer; }
+.admin-residence-list button:disabled { opacity: .38; cursor: not-allowed; }
+.admin-residence-add { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-top: 16px; }
+.admin-residence-add button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 12px 14px; border: 0; border-radius: 12px; color: #fff; background: #0b3942; font-size: 11px; font-weight: 750; cursor: pointer; }
+.residences-editor > small { display: block; margin-top: 14px; color: #71868a; font-size: 10px; }
 .admin-policy-workspace { display: grid; gap: 30px; }
 .admin-policy-hero-card { padding: clamp(25px,4vw,42px); }
 .admin-policy-sections-heading { padding: 0 4px; display: flex; align-items: end; justify-content: space-between; gap: 24px; }
@@ -1542,4 +1551,7 @@ h1 em, h2 em { color: #4f83ed; font-weight: 390; }
   .admin-policy-sections-heading { align-items: stretch; flex-direction: column; }
   .admin-policy-sections-heading button { justify-content: center; }
   .admin-policy-section { padding: 22px 17px; border-radius: 22px 22px 46px 22px; }
+  .admin-residence-list > div { grid-template-columns: 28px 1fr; }
+  .admin-residence-list button { grid-column: 2; justify-self: start; }
+  .admin-residence-add { grid-template-columns: 1fr; }
 }
