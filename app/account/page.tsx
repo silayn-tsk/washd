@@ -159,6 +159,7 @@ export default function AccountPage() {
   return (
     <main className="member-page account-page dashboard-page">
       <MemberHeader />
+      <div className="dashboard-bubbles" aria-hidden="true"><i /><i /><i /><i /><i /></div>
       <section className="dashboard-title">
         <div className="dashboard-intro"><span className="kicker">Member dashboard</span><h1>Hello, {profile.name?.split(" ")[0] || user.user_metadata?.name?.split(" ")[0] || "member"}.</h1><p>Your laundry journey, next collection and membership in one place.</p></div>
         <div className="member-id-card">
