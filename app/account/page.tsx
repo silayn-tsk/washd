@@ -24,19 +24,20 @@ type Bag = { id: string; status: string; cycle_started_at?: string; events?: Bag
 type Collection = { id: string; type: string; due: string; location: string; status: string };
 
 const trackingSteps = [
-  { key: "received", label: "Bag received", caption: "Checked and counted" },
-  { key: "washing", label: "Cleaning", caption: "Washed separately" },
-  { key: "finishing", label: "Finishing", caption: "Folded or pressed" },
-  { key: "ready", label: "Ready", caption: "At your collection point" },
-  { key: "collected", label: "Collected", caption: "Confirm you have collected your bag" },
+  { key: "member_drop_off", label: "Member drop-off", caption: "Bag left at the collection point" },
+  { key: "washd_pickup", label: "Washd pickup", caption: "Collected by the Washd team" },
+  { key: "processing", label: "Processing", caption: "Washed, dried and prepared" },
+  { key: "washd_drop_off", label: "Washd drop-off", caption: "Returned to your collection point" },
+  { key: "member_pick_up", label: "Member pickup", caption: "Confirm you have collected your bag" },
 ];
 
 function trackingIndex(status?: string) {
   const normalized = (status || "").toLowerCase().replaceAll("-", "_");
-  if (["ready", "returned", "completed", "out_for_delivery"].includes(normalized)) return 3;
-  if (["finishing", "drying", "folding", "pressing", "quality_check"].includes(normalized)) return 2;
-  if (["washing", "cleaning", "in_progress"].includes(normalized)) return 1;
-  if (["received", "collected", "picked_up", "checked_in"].includes(normalized)) return 0;
+  if (["member_pick_up", "collected", "completed"].includes(normalized)) return 4;
+  if (["washd_drop_off", "ready", "returned", "out_for_delivery"].includes(normalized)) return 3;
+  if (["processing", "finishing", "drying", "folding", "pressing", "quality_check", "washing", "cleaning", "in_progress"].includes(normalized)) return 2;
+  if (["washd_pickup", "picked_up"].includes(normalized)) return 1;
+  if (["member_drop_off", "received", "checked_in"].includes(normalized)) return 0;
   return -1;
 }
 
@@ -162,7 +163,7 @@ export default function AccountPage() {
   }
 
   async function confirmBagCollection() {
-    if (!bag || bag.status !== "ready") return;
+    if (!bag || !["washd_drop_off", "ready"].includes(bag.status)) return;
     setCollectionConfirming(true);
     setError("");
     try {
@@ -200,7 +201,7 @@ export default function AccountPage() {
           <div className="return-estimate"><Clock3 size={20} /><span>Expected return</span><strong>{formatDate(nextDue, { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}</strong></div>
         </div>
         <div className="tracking-progress">
-          {trackingSteps.map((step, index) => <div className={index < activeStep ? "done" : index === activeStep ? "active" : ""} key={step.key}><span>{index <= activeStep ? <Check size={15} /> : index + 1}</span><strong>{step.label}</strong><small>{step.caption}</small>{step.key === "collected" && bag?.status === "ready" && <button type="button" className="confirm-collection-button" disabled={collectionConfirming} onClick={() => void confirmBagCollection()}>{collectionConfirming ? "Saving…" : "Confirm collected"}</button>}</div>)}
+          {trackingSteps.map((step, index) => <div className={index < activeStep ? "done" : index === activeStep ? "active" : ""} key={step.key}><span>{index <= activeStep ? <Check size={15} /> : index + 1}</span><strong>{step.label}</strong><small>{step.caption}</small>{step.key === "member_pick_up" && ["washd_drop_off", "ready"].includes(bag?.status || "") && <button type="button" className="confirm-collection-button" disabled={collectionConfirming} onClick={() => void confirmBagCollection()}>{collectionConfirming ? "Saving…" : "Confirm collected"}</button>}</div>)}
         </div>
         <div className="tracking-footer"><span><Truck size={15} /> Updates appear here as our team scans your numbered bag.</span><small>{lastUpdated ? `Last update ${formatDate(lastUpdated, { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}` : "Waiting for your first scan"}</small></div>
       </section>}

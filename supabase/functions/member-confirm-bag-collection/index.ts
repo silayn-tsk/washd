@@ -20,13 +20,13 @@ Deno.serve(async (request) => {
       .maybeSingle();
     if (bagError) throw bagError;
     if (!bag) return json(request, { error: "Bag not found" }, 404);
-    if (bag.status !== "ready") return json(request, { error: "This bag is not ready to collect yet" }, 409);
+    if (!["washd_drop_off", "ready"].includes(bag.status)) return json(request, { error: "This bag is not ready to collect yet" }, 409);
 
     const now = new Date().toISOString();
     const events = Array.isArray(bag.events) ? bag.events : [];
     const { error: updateError } = await supabase.from("bags").update({
       status: "empty",
-      events: [...events, { status: "collected", label: "Member confirmed bag collection", at: now }],
+      events: [...events, { status: "member_pick_up", label: "Member confirmed bag pickup", at: now }],
       updated_at: now,
     }).eq("user_id", user.id).eq("id", bagId);
     if (updateError) throw updateError;

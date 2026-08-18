@@ -1,12 +1,12 @@
 import { corsHeaders, json } from "../_shared/http.ts";
 import { adminClient, requireAdmin } from "../_shared/services.ts";
 
-const allowedStatuses = ["received", "washing", "finishing", "ready", "empty"];
+const allowedStatuses = ["member_drop_off", "washd_pickup", "processing", "washd_drop_off", "empty"];
 const statusLabels: Record<string, string> = {
-  received: "Bag received and checked in",
-  washing: "Laundry is being washed separately",
-  finishing: "Laundry is being folded, pressed and quality checked",
-  ready: "Bag is ready at the collection point",
+  member_drop_off: "Member dropped bag at the collection point",
+  washd_pickup: "Washd picked up the bag",
+  processing: "Laundry is being processed by Washd",
+  washd_drop_off: "Washd dropped the bag at the collection point",
   empty: "Tracking cleared after bag collection",
 };
 
@@ -55,7 +55,7 @@ Deno.serve(async (request) => {
         type: "collection",
         due: collectionDue.toISOString(),
         location: location || "Residence lobby",
-        status: status === "ready" ? "ready" : status === "empty" ? "collected" : "scheduled",
+        status: status === "washd_drop_off" ? "ready" : status === "empty" ? "collected" : "scheduled",
         updated_at: now,
       }, { onConflict: "user_id,id" });
       if (collectionError) throw collectionError;
