@@ -49,15 +49,15 @@ export default function ProfilePage() {
     setNotice("");
     setError("");
     const pickupLabel = [residence.trim(), unit.trim()].filter(Boolean).join(" · ");
-    const { error: updateError } = await supabase.from("profiles").update({
+    const { data: savedProfile, error: updateError } = await supabase.from("profiles").update({
       name: name.trim(),
       unit: pickupLabel,
       pickup_location: { label: residence.trim(), notes: unit.trim() },
       updated_at: new Date().toISOString(),
-    }).eq("id", user.id);
+    }).eq("id", user.id).select("member_id, name, email, unit, pickup_location").maybeSingle();
     setSaving(false);
-    if (updateError) { setError("We couldn’t save your profile. Please try again."); return; }
-    setProfile((current) => ({ ...current, name: name.trim(), unit: pickupLabel, pickup_location: { label: residence.trim(), notes: unit.trim() } }));
+    if (updateError || !savedProfile) { setError("We couldn’t save your profile. Please sign out, log in again, and retry."); return; }
+    setProfile(savedProfile as Profile);
     setNotice("Your member profile is updated.");
   }
 
