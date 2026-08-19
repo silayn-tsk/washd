@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { BusinessDisclosure } from "./business-disclosure";
 import { useSiteContent } from "./use-site-content";
 import type { PolicyPageContent, SiteContent } from "@/lib/site-content";
+import { siteUrl } from "@/lib/site-url";
 
 type LegalLocale = "en" | "ms" | "zh" | "ko";
 
@@ -40,12 +41,12 @@ function PolicyCopy({ body, phone, whatsappNumber }: { body: string; phone: stri
 function ManagedPolicyBody({ policy, content, plans, addons }: { policy: PolicyPageContent; content: SiteContent; plans: Array<{ name: string; price_rm: number; description: string }>; addons: Array<{ name: string; price_rm: number }> }) {
   const replacements: Record<string, string> = {
     businessName: content.contact.legalName || "Washd",
-    website: "https://washd-my-86c6d.web.app",
+    website: siteUrl,
     email: content.contact.email,
     phone: content.contact.phoneDisplay,
     serviceArea: content.contact.serviceArea,
-    plans: plans.map((plan) => `- ${plan.name} — RM ${plan.price_rm} per month: ${plan.description}`).join("\n"),
-    addons: addons.map((addon) => `- ${addon.name} — RM ${addon.price_rm} per month`).join("\n"),
+    plans: plans.map((plan) => `- ${plan.name}: RM ${plan.price_rm} per month. ${plan.description}`).join("\n"),
+    addons: addons.map((addon) => `- ${addon.name}: RM ${addon.price_rm} per month`).join("\n"),
   };
   const resolve = (value: string) => value.replace(/\{(businessName|website|email|phone|serviceArea|plans|addons)\}/g, (_, key: string) => replacements[key]);
   return <>{policy.sections.map((section, index) => <section key={`${section.heading}-${index}`}><h2>{section.heading}</h2><PolicyCopy body={resolve(section.body)} phone={content.contact.phoneDisplay} whatsappNumber={content.contact.whatsappNumber} /></section>)}</>;
