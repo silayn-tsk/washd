@@ -44,6 +44,7 @@ function trackingIndex(status?: string) {
 type PickupDay = "monday" | "wednesday";
 
 function nextFixedDrop(pickupDay?: PickupDay) {
+  if (!pickupDay) return undefined;
   const now = new Date();
   // New Washd routes begin in September 2026. Keep the start date local so the
   // displayed weekday stays correct for members viewing from Malaysia.
@@ -53,10 +54,10 @@ function nextFixedDrop(pickupDay?: PickupDay) {
     const candidate = new Date(date);
     candidate.setDate(date.getDate() + days);
     candidate.setHours(9, 30, 0, 0);
-    const allowedDay = pickupDay === "monday" ? 1 : pickupDay === "wednesday" ? 3 : undefined;
-    if ((allowedDay ? candidate.getDay() === allowedDay : [1, 3].includes(candidate.getDay())) && candidate > now) return candidate;
+    const allowedDay = pickupDay === "monday" ? 1 : 3;
+    if (candidate.getDay() === allowedDay && candidate > now) return candidate;
   }
-  return now;
+  return undefined;
 }
 
 function formatDate(value: string | Date, options?: Intl.DateTimeFormatOptions) {
@@ -198,7 +199,7 @@ export default function AccountPage() {
         <div className="tracking-topline"><div><span className="live-dot" /> Live bag tracking</div><button type="button" onClick={() => void loadDashboard()} disabled={dataLoading}><RefreshCw size={15} className={dataLoading ? "spin" : ""} /> Refresh</button></div>
         <div className="tracking-summary">
           <div><span>{`Bag ${bag?.id}`}</span><h2>{trackingSteps[Math.max(activeStep, 0)]?.label || "In our care"}</h2><p>{latestEvent?.label || "Your bag is moving through the Washd care process."}</p></div>
-          <div className="return-estimate"><Clock3 size={20} /><span>Expected return</span><strong>{formatDate(nextDue, { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}</strong></div>
+          <div className="return-estimate"><Clock3 size={20} /><span>Expected return</span><strong>{nextDue ? formatDate(nextDue, { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }) : "To be confirmed"}</strong></div>
         </div>
         <div className="tracking-progress">
           {trackingSteps.map((step, index) => <div className={index < activeStep ? "done" : index === activeStep ? "active" : ""} key={step.key}><span>{index <= activeStep ? <Check size={15} /> : index + 1}</span><strong>{step.label}</strong><small>{step.caption}</small>{step.key === "member_pick_up" && ["washd_drop_off", "ready"].includes(bag?.status || "") && <button type="button" className="confirm-collection-button" disabled={collectionConfirming} onClick={() => void confirmBagCollection()}>{collectionConfirming ? "Saving…" : "Confirm collected"}</button>}</div>)}
@@ -207,7 +208,7 @@ export default function AccountPage() {
       </section>}
 
       <section className="dashboard-grid">
-        <article className="dashboard-card collection-card"><div className="dashboard-card-icon"><CalendarDays size={22} /></div><span>Next collection</span><h3>{formatDate(nextDue)}</h3><p><Clock3 size={15} /> {collection ? formatDate(collection.due, { hour: "numeric", minute: "2-digit" }) : "Drop by 9:30am"}</p><p><MapPin size={15} /> {profile.unit || collection?.location || "Residence lobby"}</p><small>{collection ? collection.status : "Fixed weekly route"}</small></article>
+        <article className="dashboard-card collection-card"><div className="dashboard-card-icon"><CalendarDays size={22} /></div><span>Next collection</span><h3>{nextDue ? formatDate(nextDue) : "Choose your day"}</h3><p><Clock3 size={15} /> {collection ? formatDate(collection.due, { hour: "numeric", minute: "2-digit" }) : weeklyPickupDay ? "Drop by 9:30am" : "Select Monday or Wednesday first"}</p><p><MapPin size={15} /> {profile.unit || collection?.location || "Residence lobby"}</p><small>{collection ? collection.status : weeklyPickupDay ? "Fixed weekly route" : "No weekly route yet"}</small></article>
         <article className="dashboard-card pickup-day-card"><div className="dashboard-card-icon"><CalendarDays size={22} /></div><span>Weekly pickup day</span>{weeklyPickupDay ? <><h3>Every {weeklyPickupDay === "monday" ? "Monday" : "Wednesday"}</h3><p>Your weekly Washd collection follows this fixed route.</p><p><Clock3 size={15} /> Drop by 9:30am</p><a className="text-button" href={`https://wa.me/60176494749?text=${encodeURIComponent("Hi Washd, I would like to request a change to my weekly pickup day.")}`} target="_blank" rel="noreferrer">Request a change on WhatsApp <ArrowRight size={16} /></a></> : <><h3>Choose your day</h3><p>Select one fixed weekly collection day. It cannot be changed online later.</p><div className="pickup-day-options"><button type="button" onClick={() => setPickupDayChoice("monday")}>Monday</button><button type="button" onClick={() => setPickupDayChoice("wednesday")}>Wednesday</button></div></>}</article>
         <article className="dashboard-card plan-dashboard-card"><div className="dashboard-card-icon"><PackageCheck size={22} /></div><span>Current membership</span><h3>{planName}</h3><p>{plan?.description || (profile.plan_id ? "Your active Washd membership" : "Choose a plan to begin weekly collections.")}</p>{activeAddonRows.length > 0 && <div className="active-addons">{activeAddonRows.map((addon) => <span key={addon.id}><Shirt size={13} /> {addon.name}</span>)}</div>}<a className="text-button" href="/plans">{profile.plan_id ? "View or change plan" : "Choose a plan"} <ArrowRight size={16} /></a></article>
         <article className="dashboard-card"><div className="dashboard-card-icon"><CreditCard size={22} /></div><span>Billing</span><h3>{profile.payment_last4 ? `${profile.payment_brand || "Card"} •••• ${profile.payment_last4}` : "No payment method"}</h3><p>{profile.current_period_end ? `Next renewal ${formatDate(profile.current_period_end)}` : "Your card details are entered only on secure checkout."}</p><button className="text-button" type="button" disabled={billingBusy || !profile.payment_last4} onClick={() => void manageBilling()}>{billingBusy ? "Opening…" : profile.payment_last4 ? "Manage billing" : "Available after payment"} {profile.payment_last4 && <ArrowRight size={16} />}</button></article>

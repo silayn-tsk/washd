@@ -84,7 +84,7 @@ export default function AdminTrackingPage() {
     ? "Monday"
     : selectedMember?.pickup_location?.weeklyPickupDay === "wednesday"
       ? "Wednesday"
-      : "Not selected yet";
+      : "";
 
   useEffect(() => {
     if (!selectedMember) return;
