@@ -422,6 +422,13 @@ h1 em, h2 em { color: #4f83ed; font-weight: 390; }
 .signup-card form::before { content: "Create your account"; margin-bottom: 3px; color: #123f4b; font: 600 clamp(25px,3vw,36px)/1 var(--font-montserrat),Arial,sans-serif; letter-spacing: -.045em; }
 .signup-card form::after { content: "Your weekly laundry rhythm starts in a few simple steps."; order: 0; margin-top: -9px; margin-bottom: 10px; color: #71858a; font-size: 12px; line-height: 1.5; }
 .signup-card form > label, .signup-card form > .turnstile-widget, .signup-card form > .form-alert, .signup-card form > .button, .signup-card form > .form-foot { position: relative; z-index: 1; }
+.signup-pickup-day { position: relative; z-index: 1; margin: 0; padding: 14px; border: 1px solid #d7e4e8; border-radius: 14px; background: rgba(241,248,249,.78); }
+.signup-pickup-day legend { padding: 0 4px; color: #17353d; font-size: 11px; font-weight: 680; }
+.signup-pickup-day p { margin: 0 0 11px; color: #6d8388; font-size: 11px; line-height: 1.45; }
+.signup-pickup-day > div { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.signup-card .signup-pickup-day label { display: flex; flex-direction: row; align-items: center; gap: 8px; padding: 10px 11px; border: 1px solid rgba(26,122,140,.22); border-radius: 999px; color: #0b3942; background: rgba(255,255,255,.92); font-size: 12px; font-weight: 700; cursor: pointer; }
+.signup-card .signup-pickup-day input { width: 15px; height: 15px; margin: 0; padding: 0; accent-color: #1a7a8c; box-shadow: none !important; transform: none !important; }
+.signup-pickup-day small { display: block; margin-top: 10px; color: #71858a; font-size: 10px; line-height: 1.4; }
 .signup-card input, .signup-card select { background: rgba(255,255,255,.96) !important; border-color: #d7e4e8 !important; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
 .signup-card input:focus, .signup-card select:focus { border-color: #4b9ab4 !important; box-shadow: 0 0 0 4px rgba(63,154,183,.14) !important; transform: translateY(-1px); }
 .signup-card .gold-button { background: linear-gradient(100deg,#d6af63,#f0ca7a); border: 0; }

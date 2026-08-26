@@ -17,7 +17,7 @@ type Profile = {
   payment_last4?: string;
   unit?: string;
   current_period_end?: string;
-  pickup_location?: { label?: string; notes?: string; weeklyPickupDay?: string };
+  pickup_location?: { label?: string; notes?: string; weeklyPickupDay?: string; pickupDayChangeUsed?: boolean };
 };
 type BagEvent = { status?: string; label?: string; at?: string };
 type Bag = { id: string; status: string; cycle_started_at?: string; events?: BagEvent[]; updated_at?: string };
@@ -76,6 +76,7 @@ export default function AccountPage() {
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
   const [memberIdCopied, setMemberIdCopied] = useState(false);
   const [pickupDayChoice, setPickupDayChoice] = useState<PickupDay | null>(null);
+  const [changingPickupDay, setChangingPickupDay] = useState(false);
   const [pickupDayBusy, setPickupDayBusy] = useState(false);
   const [collectionConfirming, setCollectionConfirming] = useState(false);
 
@@ -132,6 +133,7 @@ export default function AccountPage() {
   const weeklyPickupDay = profile.pickup_location?.weeklyPickupDay === "monday" || profile.pickup_location?.weeklyPickupDay === "wednesday"
     ? profile.pickup_location.weeklyPickupDay
     : undefined;
+  const pickupDayChangeUsed = profile.pickup_location?.pickupDayChangeUsed === true;
   const nextDrop = useMemo(() => nextFixedDrop(weeklyPickupDay), [weeklyPickupDay]);
   const nextDue = collection?.due || nextDrop;
   const latestEvent = bag?.events?.at(-1);
@@ -151,14 +153,15 @@ export default function AccountPage() {
     setError("");
     const pickupLocation = typeof profile.pickup_location === "object" && profile.pickup_location ? profile.pickup_location : {};
     const { error: updateError } = await supabase.from("profiles").update({
-      pickup_location: { ...pickupLocation, weeklyPickupDay: pickupDayChoice },
+      pickup_location: { ...pickupLocation, weeklyPickupDay: pickupDayChoice, pickupDayChangeUsed: changingPickupDay ? true : pickupLocation.pickupDayChangeUsed === true },
       updated_at: new Date().toISOString(),
     }).eq("id", user.id);
     if (updateError) {
       setError("We couldn’t save your weekly pickup day. Please try again or contact Washd on WhatsApp.");
     } else {
-      setProfile((current) => ({ ...current, pickup_location: { ...pickupLocation, weeklyPickupDay: pickupDayChoice } }));
+      setProfile((current) => ({ ...current, pickup_location: { ...pickupLocation, weeklyPickupDay: pickupDayChoice, pickupDayChangeUsed: changingPickupDay ? true : pickupLocation.pickupDayChangeUsed === true } }));
       setPickupDayChoice(null);
+      setChangingPickupDay(false);
     }
     setPickupDayBusy(false);
   }
@@ -209,22 +212,22 @@ export default function AccountPage() {
 
       <section className="dashboard-grid">
         <article className="dashboard-card collection-card"><div className="dashboard-card-icon"><CalendarDays size={22} /></div><span>Next collection</span><h3>{nextDue ? formatDate(nextDue) : "Choose your day"}</h3><p><Clock3 size={15} /> {collection ? formatDate(collection.due, { hour: "numeric", minute: "2-digit" }) : weeklyPickupDay ? "Drop by 9:30am" : "Select Monday or Wednesday first"}</p><p><MapPin size={15} /> {profile.unit || collection?.location || "Residence lobby"}</p><small>{collection ? collection.status : weeklyPickupDay ? "Fixed weekly route" : "No weekly route yet"}</small></article>
-        <article className="dashboard-card pickup-day-card"><div className="dashboard-card-icon"><CalendarDays size={22} /></div><span>Weekly pickup day</span>{weeklyPickupDay ? <><h3>Every {weeklyPickupDay === "monday" ? "Monday" : "Wednesday"}</h3><p>Your weekly Washd collection follows this fixed route.</p><p><Clock3 size={15} /> Drop by 9:30am</p><a className="text-button" href={`https://wa.me/60176494749?text=${encodeURIComponent("Hi Washd, I would like to request a change to my weekly pickup day.")}`} target="_blank" rel="noreferrer">Request a change on WhatsApp <ArrowRight size={16} /></a></> : <><h3>Choose your day</h3><p>Select one fixed weekly collection day. It cannot be changed online later.</p><div className="pickup-day-options"><button type="button" onClick={() => setPickupDayChoice("monday")}>Monday</button><button type="button" onClick={() => setPickupDayChoice("wednesday")}>Wednesday</button></div></>}</article>
+        <article className="dashboard-card pickup-day-card"><div className="dashboard-card-icon"><CalendarDays size={22} /></div><span>Weekly pickup day</span>{weeklyPickupDay ? <><h3>Every {weeklyPickupDay === "monday" ? "Monday" : "Wednesday"}</h3><p>Your weekly Washd collection follows this fixed route.</p><p><Clock3 size={15} /> Drop by 9:30am</p>{!pickupDayChangeUsed ? <button className="text-button" type="button" onClick={() => { setChangingPickupDay(true); setPickupDayChoice(weeklyPickupDay === "monday" ? "wednesday" : "monday"); }}>Change your day once <ArrowRight size={16} /></button> : <a className="text-button" href={`https://wa.me/60176494749?text=${encodeURIComponent("Hi Washd, I would like to request a change to my weekly pickup day.")}`} target="_blank" rel="noreferrer">Request a change on WhatsApp <ArrowRight size={16} /></a>}</> : <><h3>Choose your day</h3><p>Select one fixed weekly collection day before your first collection.</p><div className="pickup-day-options"><button type="button" onClick={() => { setChangingPickupDay(false); setPickupDayChoice("monday"); }}>Monday</button><button type="button" onClick={() => { setChangingPickupDay(false); setPickupDayChoice("wednesday"); }}>Wednesday</button></div></>}</article>
         <article className="dashboard-card plan-dashboard-card"><div className="dashboard-card-icon"><PackageCheck size={22} /></div><span>Current membership</span><h3>{planName}</h3><p>{plan?.description || (profile.plan_id ? "Your active Washd membership" : "Choose a plan to begin weekly collections.")}</p>{activeAddonRows.length > 0 && <div className="active-addons">{activeAddonRows.map((addon) => <span key={addon.id}><Shirt size={13} /> {addon.name}</span>)}</div>}<a className="text-button" href="/plans">{profile.plan_id ? "View or change plan" : "Choose a plan"} <ArrowRight size={16} /></a></article>
         <article className="dashboard-card"><div className="dashboard-card-icon"><CreditCard size={22} /></div><span>Billing</span><h3>{profile.payment_last4 ? `${profile.payment_brand || "Card"} •••• ${profile.payment_last4}` : "No payment method"}</h3><p>{profile.current_period_end ? `Next renewal ${formatDate(profile.current_period_end)}` : "Your card details are entered only on secure checkout."}</p><button className="text-button" type="button" disabled={billingBusy || !profile.payment_last4} onClick={() => void manageBilling()}>{billingBusy ? "Opening…" : profile.payment_last4 ? "Manage billing" : "Available after payment"} {profile.payment_last4 && <ArrowRight size={16} />}</button></article>
         <article className="dashboard-card member-profile-card"><div className="dashboard-card-icon"><UserRound size={22} /></div><span>Member profile</span><h3>{profile.name || user.user_metadata?.name || "Washd member"}</h3><p>{user.email}</p><p>{profile.unit || "Residence lobby"}</p><button className="text-button logout-button" type="button" onClick={async () => { await supabase.auth.signOut(); window.location.assign("/"); }}><LogOut size={15} /> Log out</button></article>
       </section>
 
       <section className="dashboard-help"><Sparkles size={22} /><div><span>Need help with a collection?</span><p>Share your member ID and bag number with the Washd team for the fastest assistance.</p></div><a href="https://wa.me/60176494749" target="_blank" rel="noreferrer">Message Washd <ArrowRight size={16} /></a></section>
-      {pickupDayChoice && <div className="pickup-day-modal-backdrop" role="presentation" onClick={() => !pickupDayBusy && setPickupDayChoice(null)}>
+      {pickupDayChoice && <div className="pickup-day-modal-backdrop" role="presentation" onClick={() => !pickupDayBusy && (setPickupDayChoice(null), setChangingPickupDay(false))}>
         <section className="pickup-day-modal" role="dialog" aria-modal="true" aria-labelledby="pickup-day-title" onClick={(event) => event.stopPropagation()}>
-          <button className="pickup-day-modal-close" type="button" onClick={() => setPickupDayChoice(null)} disabled={pickupDayBusy} aria-label="Close pickup-day confirmation"><X size={20} /></button>
-          <span className="kicker">Confirm weekly pickup day</span>
+          <button className="pickup-day-modal-close" type="button" onClick={() => { setPickupDayChoice(null); setChangingPickupDay(false); }} disabled={pickupDayBusy} aria-label="Close pickup-day confirmation"><X size={20} /></button>
+          <span className="kicker">{changingPickupDay ? "One-time route change" : "Confirm weekly pickup day"}</span>
           <CalendarDays size={30} />
           <h2 id="pickup-day-title">Every {pickupDayChoice === "monday" ? "Monday" : "Wednesday"}</h2>
-          <p>This will be your weekly laundry pickup date. Your collection will follow this same day every week.</p>
-          <div className="pickup-day-modal-note">If you need to change your pickup day later, please contact Washd on WhatsApp.</div>
-          <div className="pickup-day-modal-actions"><button type="button" onClick={() => setPickupDayChoice(null)} disabled={pickupDayBusy}>Back</button><button className="button gold-button" type="button" onClick={() => void confirmPickupDay()} disabled={pickupDayBusy}>{pickupDayBusy ? "Saving…" : `Confirm ${pickupDayChoice === "monday" ? "Monday" : "Wednesday"}`} <ArrowRight size={17} /></button></div>
+          <p>{changingPickupDay ? "This is your one online change to your weekly laundry pickup date." : "This will be your weekly laundry pickup date. Your collection will follow this same day every week."}</p>
+          <div className="pickup-day-modal-note">{changingPickupDay ? "After this change, contact Washd on WhatsApp for any future route requests." : "You will have one chance to change your pickup day after joining."}</div>
+          <div className="pickup-day-modal-actions"><button type="button" onClick={() => { setPickupDayChoice(null); setChangingPickupDay(false); }} disabled={pickupDayBusy}>Back</button><button className="button gold-button" type="button" onClick={() => void confirmPickupDay()} disabled={pickupDayBusy}>{pickupDayBusy ? "Saving…" : `Confirm ${pickupDayChoice === "monday" ? "Monday" : "Wednesday"}`} <ArrowRight size={17} /></button></div>
         </section>
       </div>}
     </main>

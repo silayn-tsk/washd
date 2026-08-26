@@ -32,6 +32,7 @@ export default function SignupPage() {
   const [name, setName] = useState("");
   const [residence, setResidence] = useState("");
   const [unit, setUnit] = useState("");
+  const [weeklyPickupDay, setWeeklyPickupDay] = useState<"monday" | "wednesday" | "">("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -58,16 +59,17 @@ export default function SignupPage() {
       if (!isSupabaseConfigured) throw new Error("Supabase is not configured");
       if (turnstileSiteKey && !captchaToken) throw new Error("CAPTCHA_REQUIRED");
       const pickupLabel = [residence.trim(), unit.trim()].filter(Boolean).join(" · ");
+      if (!weeklyPickupDay) throw new Error("PICKUP_DAY_REQUIRED");
       const { data, error: signupError } = await supabase.auth.signUp({
         email: email.trim(), password,
-        options: { emailRedirectTo: `${window.location.origin}/plans`, captchaToken: captchaToken || undefined, data: { name: name.trim(), unit: pickupLabel, pickup_location: { label: residence.trim(), notes: unit.trim() }, terms_accepted: true, terms_version: TERMS_VERSION } },
+        options: { emailRedirectTo: `${window.location.origin}/plans`, captchaToken: captchaToken || undefined, data: { name: name.trim(), unit: pickupLabel, pickup_location: { label: residence.trim(), notes: unit.trim(), weeklyPickupDay, pickupDayChangeUsed: false }, terms_accepted: true, terms_version: TERMS_VERSION } },
       });
       if (signupError) throw signupError;
       window.location.assign(data.session ? "/plans" : "/login?signup=check-email");
     } catch (caught) {
       const message = (caught as { message?: string }).message?.toLowerCase() ?? "";
       setTermsOpen(false);
-      setError(message.includes("captcha_required") ? "Complete the security check before creating your account." : message.includes("terms_required") ? "Please accept the Service Terms before creating an account." : message.includes("already registered") ? "An account already exists for this email. Try logging in instead." : message.includes("password") ? "Choose a password with at least 10 characters." : message.includes("not configured") ? "Washd account creation is being connected. Please try again shortly." : "We couldn’t create your account. Please check your details and try again.");
+      setError(message.includes("pickup_day_required") ? "Choose Monday or Wednesday for your weekly pickup before creating your account." : message.includes("captcha_required") ? "Complete the security check before creating your account." : message.includes("terms_required") ? "Please accept the Service Terms before creating an account." : message.includes("already registered") ? "An account already exists for this email. Try logging in instead." : message.includes("password") ? "Choose a password with at least 10 characters." : message.includes("not configured") ? "Washd account creation is being connected. Please try again shortly." : "We couldn’t create your account. Please check your details and try again.");
     } finally { setBusy(false); if (turnstileSiteKey) setCaptchaReset((value) => value + 1); }
   }
 
@@ -79,6 +81,7 @@ export default function SignupPage() {
         <label>Full name<input required minLength={2} autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} placeholder="Your name" /></label>
         <label>Residence<select required value={residence} onChange={(event) => setResidence(event.target.value)}><option value="" disabled>Select your residence</option>{content.residences.options.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
         <label>Unit / apartment number<input required autoComplete="street-address" value={unit} onChange={(event) => setUnit(event.target.value)} placeholder="e.g. Unit 12-3" /></label>
+        <fieldset className="signup-pickup-day"><legend>Weekly pickup day</legend><p>Choose your fixed collection day. Your first collection begins in September.</p><div><label><input required type="radio" name="weekly-pickup-day" value="monday" checked={weeklyPickupDay === "monday"} onChange={() => setWeeklyPickupDay("monday")} /> Monday</label><label><input type="radio" name="weekly-pickup-day" value="wednesday" checked={weeklyPickupDay === "wednesday"} onChange={() => setWeeklyPickupDay("wednesday")} /> Wednesday</label></div><small>You will have one chance to change this after joining.</small></fieldset>
         <label>Email<input required type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" /></label>
         <label>Password<span className="password-field"><input required minLength={10} type={showPassword ? "text" : "password"} autoComplete="new-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="At least 10 characters" /><button type="button" aria-label={showPassword ? "Hide password" : "Show password"} onClick={() => setShowPassword((value) => !value)}>{showPassword ? <EyeOff size={19} /> : <Eye size={19} />}</button></span></label>
         <TurnstileWidget action="signup" onToken={handleCaptcha} resetSignal={captchaReset} />
