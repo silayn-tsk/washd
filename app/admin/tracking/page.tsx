@@ -84,7 +84,10 @@ export default function AdminTrackingPage() {
   useEffect(() => {
     if (!selectedMember) return;
     queueMicrotask(() => {
-      setBagId(memberBag?.id || `WSHD-${selectedMember.member_id.replace(/\D/g, "").padStart(2, "0")}`);
+      // The first physical bag is numbered to match its member account.
+      // Existing bag IDs remain unchanged, but a new tracking cycle starts
+      // with the same identifier as the selected member (for example WASHD12).
+      setBagId(memberBag?.id || selectedMember.member_id.toUpperCase());
       setStatus(normaliseTrackingStatus(memberBag?.status));
       setLocation(memberCollection?.location || selectedMember.unit || "Residence lobby");
       if (memberCollection?.due) {
