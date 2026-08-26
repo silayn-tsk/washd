@@ -50,18 +50,20 @@ function nextFixedDrop(pickupDay?: PickupDay, selectedAt?: string) {
   // displayed weekday stays correct for members viewing from Malaysia.
   const routeStart = new Date(2026, 8, 1, 0, 0, 0, 0);
   const selectedDate = selectedAt ? new Date(selectedAt) : undefined;
-  // Legacy members had an established route before this 48-hour safeguard.
-  // New selections are allowed only after a full 48 hours have passed.
-  const eligibleFrom = selectedDate && !Number.isNaN(selectedDate.valueOf())
-    ? new Date(selectedDate.getTime() + 48 * 60 * 60 * 1000)
-    : routeStart;
-  const date = new Date(Math.max(now.getTime(), routeStart.getTime(), eligibleFrom.getTime()));
+  // Washd treats the 48-hour lead time as two calendar days. This keeps the
+  // promised Saturday → Monday route, while a Sunday → Monday choice rolls
+  // over to the following Monday.
+  const routeSelectionDate = selectedDate && !Number.isNaN(selectedDate.valueOf()) ? selectedDate : undefined;
+  const date = new Date(Math.max(now.getTime(), routeStart.getTime()));
   for (let days = 0; days < 8; days += 1) {
     const candidate = new Date(date);
     candidate.setDate(date.getDate() + days);
     candidate.setHours(9, 30, 0, 0);
     const allowedDay = pickupDay === "monday" ? 1 : 3;
-    if (candidate.getDay() === allowedDay && candidate >= eligibleFrom && candidate > now) return candidate;
+    const selectedDay = routeSelectionDate && new Date(routeSelectionDate.getFullYear(), routeSelectionDate.getMonth(), routeSelectionDate.getDate());
+    const candidateDay = new Date(candidate.getFullYear(), candidate.getMonth(), candidate.getDate());
+    const calendarDaysNotice = selectedDay ? Math.round((candidateDay.getTime() - selectedDay.getTime()) / 86_400_000) : 2;
+    if (candidate.getDay() === allowedDay && calendarDaysNotice >= 2 && candidate > now) return candidate;
   }
   return undefined;
 }

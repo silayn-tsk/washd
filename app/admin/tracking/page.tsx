@@ -37,17 +37,18 @@ function defaultReturnDate(pickupDay?: "monday" | "wednesday", selectedAt?: stri
   const now = new Date();
   const routeStart = new Date(2026, 8, 1, 0, 0, 0, 0);
   const selectedDate = selectedAt ? new Date(selectedAt) : undefined;
-  const eligibleFrom = selectedDate && !Number.isNaN(selectedDate.valueOf())
-    ? new Date(selectedDate.getTime() + 48 * 60 * 60 * 1000)
-    : routeStart;
-  const startDate = new Date(Math.max(now.getTime(), routeStart.getTime(), eligibleFrom.getTime()));
+  const routeSelectionDate = selectedDate && !Number.isNaN(selectedDate.valueOf()) ? selectedDate : undefined;
+  const startDate = new Date(Math.max(now.getTime(), routeStart.getTime()));
   const routeDay = pickupDay === "monday" ? 1 : 3;
 
   for (let days = 0; days < 8; days += 1) {
     const collection = new Date(startDate);
     collection.setDate(startDate.getDate() + days);
     collection.setHours(9, 30, 0, 0);
-    if (collection.getDay() === routeDay && collection >= eligibleFrom && collection >= now) {
+    const selectedDay = routeSelectionDate && new Date(routeSelectionDate.getFullYear(), routeSelectionDate.getMonth(), routeSelectionDate.getDate());
+    const collectionDay = new Date(collection.getFullYear(), collection.getMonth(), collection.getDate());
+    const calendarDaysNotice = selectedDay ? Math.round((collectionDay.getTime() - selectedDay.getTime()) / 86_400_000) : 2;
+    if (collection.getDay() === routeDay && calendarDaysNotice >= 2 && collection >= now) {
       const returned = new Date(collection);
       returned.setDate(returned.getDate() + 2);
       returned.setHours(17, 30, 0, 0);
