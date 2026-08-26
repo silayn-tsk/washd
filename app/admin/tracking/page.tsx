@@ -7,7 +7,7 @@ import { useAuth } from "../../auth-provider";
 import { supabase } from "@/lib/supabase";
 import { redirectForAdminMfa, resolveAdminAccess } from "@/lib/admin-access";
 
-type Member = { id: string; member_id: string; name?: string; email?: string; unit?: string; pickup_location?: { weeklyPickupDay?: string } };
+type Member = { id: string; member_id: string; name?: string; email?: string; unit?: string; pickup_location?: { weeklyPickupDay?: string; weeklyPickupDaySelectedAt?: string } };
 type Bag = { user_id: string; id: string; status: string; updated_at: string };
 type Collection = { user_id: string; due: string; location: string; status: string };
 
@@ -32,18 +32,22 @@ function trackingStatusLabel(status?: string) {
   return trackingStatusOptions.find((option) => option.value === normaliseTrackingStatus(status))?.label || "Member drop-off";
 }
 
-function defaultReturnDate(pickupDay?: "monday" | "wednesday") {
+function defaultReturnDate(pickupDay?: "monday" | "wednesday", selectedAt?: string) {
   if (!pickupDay) return "";
   const now = new Date();
   const routeStart = new Date(2026, 8, 1, 0, 0, 0, 0);
-  const startDate = now > routeStart ? now : routeStart;
+  const selectedDate = selectedAt ? new Date(selectedAt) : undefined;
+  const eligibleFrom = selectedDate && !Number.isNaN(selectedDate.valueOf())
+    ? new Date(selectedDate.getTime() + 48 * 60 * 60 * 1000)
+    : routeStart;
+  const startDate = new Date(Math.max(now.getTime(), routeStart.getTime(), eligibleFrom.getTime()));
   const routeDay = pickupDay === "monday" ? 1 : 3;
 
   for (let days = 0; days < 8; days += 1) {
     const collection = new Date(startDate);
     collection.setDate(startDate.getDate() + days);
     collection.setHours(9, 30, 0, 0);
-    if (collection.getDay() === routeDay && collection >= now) {
+    if (collection.getDay() === routeDay && collection >= eligibleFrom && collection >= now) {
       const returned = new Date(collection);
       returned.setDate(returned.getDate() + 2);
       returned.setHours(17, 30, 0, 0);
@@ -113,7 +117,7 @@ export default function AdminTrackingPage() {
         const date = new Date(memberCollection.due);
         const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
         setCollectionDue(local.toISOString().slice(0, 16));
-      } else setCollectionDue(defaultReturnDate(selectedPickupDay));
+      } else setCollectionDue(defaultReturnDate(selectedPickupDay, selectedMember.pickup_location?.weeklyPickupDaySelectedAt));
     });
   }, [selectedMember, memberBag, memberCollection, selectedPickupDay]);
 

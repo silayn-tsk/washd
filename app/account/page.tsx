@@ -17,7 +17,7 @@ type Profile = {
   payment_last4?: string;
   unit?: string;
   current_period_end?: string;
-  pickup_location?: { label?: string; notes?: string; weeklyPickupDay?: string; pickupDayChangeUsed?: boolean };
+  pickup_location?: { label?: string; notes?: string; weeklyPickupDay?: string; weeklyPickupDaySelectedAt?: string; pickupDayChangeUsed?: boolean };
 };
 type BagEvent = { status?: string; label?: string; at?: string };
 type Bag = { id: string; status: string; cycle_started_at?: string; events?: BagEvent[]; updated_at?: string };
@@ -43,19 +43,25 @@ function trackingIndex(status?: string) {
 
 type PickupDay = "monday" | "wednesday";
 
-function nextFixedDrop(pickupDay?: PickupDay) {
+function nextFixedDrop(pickupDay?: PickupDay, selectedAt?: string) {
   if (!pickupDay) return undefined;
   const now = new Date();
   // New Washd routes begin in September 2026. Keep the start date local so the
   // displayed weekday stays correct for members viewing from Malaysia.
   const routeStart = new Date(2026, 8, 1, 0, 0, 0, 0);
-  const date = now > routeStart ? now : routeStart;
+  const selectedDate = selectedAt ? new Date(selectedAt) : undefined;
+  // Legacy members had an established route before this 48-hour safeguard.
+  // New selections are allowed only after a full 48 hours have passed.
+  const eligibleFrom = selectedDate && !Number.isNaN(selectedDate.valueOf())
+    ? new Date(selectedDate.getTime() + 48 * 60 * 60 * 1000)
+    : routeStart;
+  const date = new Date(Math.max(now.getTime(), routeStart.getTime(), eligibleFrom.getTime()));
   for (let days = 0; days < 8; days += 1) {
     const candidate = new Date(date);
     candidate.setDate(date.getDate() + days);
     candidate.setHours(9, 30, 0, 0);
     const allowedDay = pickupDay === "monday" ? 1 : 3;
-    if (candidate.getDay() === allowedDay && candidate > now) return candidate;
+    if (candidate.getDay() === allowedDay && candidate >= eligibleFrom && candidate > now) return candidate;
   }
   return undefined;
 }
@@ -134,7 +140,8 @@ export default function AccountPage() {
     ? profile.pickup_location.weeklyPickupDay
     : undefined;
   const pickupDayChangeUsed = profile.pickup_location?.pickupDayChangeUsed === true;
-  const nextDrop = useMemo(() => nextFixedDrop(weeklyPickupDay), [weeklyPickupDay]);
+  const pickupDaySelectedAt = profile.pickup_location?.weeklyPickupDaySelectedAt;
+  const nextDrop = useMemo(() => nextFixedDrop(weeklyPickupDay, pickupDaySelectedAt), [weeklyPickupDay, pickupDaySelectedAt]);
   const nextDue = collection?.due || nextDrop;
   const latestEvent = bag?.events?.at(-1);
   const lastUpdated = bag?.updated_at || latestEvent?.at;
@@ -153,13 +160,13 @@ export default function AccountPage() {
     setError("");
     const pickupLocation = typeof profile.pickup_location === "object" && profile.pickup_location ? profile.pickup_location : {};
     const { error: updateError } = await supabase.from("profiles").update({
-      pickup_location: { ...pickupLocation, weeklyPickupDay: pickupDayChoice, pickupDayChangeUsed: changingPickupDay ? true : pickupLocation.pickupDayChangeUsed === true },
+      pickup_location: { ...pickupLocation, weeklyPickupDay: pickupDayChoice, weeklyPickupDaySelectedAt: new Date().toISOString(), pickupDayChangeUsed: changingPickupDay ? true : pickupLocation.pickupDayChangeUsed === true },
       updated_at: new Date().toISOString(),
     }).eq("id", user.id);
     if (updateError) {
       setError("We couldn’t save your weekly pickup day. Please try again or contact Washd on WhatsApp.");
     } else {
-      setProfile((current) => ({ ...current, pickup_location: { ...pickupLocation, weeklyPickupDay: pickupDayChoice, pickupDayChangeUsed: changingPickupDay ? true : pickupLocation.pickupDayChangeUsed === true } }));
+      setProfile((current) => ({ ...current, pickup_location: { ...pickupLocation, weeklyPickupDay: pickupDayChoice, weeklyPickupDaySelectedAt: new Date().toISOString(), pickupDayChangeUsed: changingPickupDay ? true : pickupLocation.pickupDayChangeUsed === true } }));
       setPickupDayChoice(null);
       setChangingPickupDay(false);
     }

@@ -34,7 +34,13 @@ begin
     new.email,
     new.raw_user_meta_data ->> 'name',
     pickup_label,
-    coalesce(new.raw_user_meta_data -> 'pickup_location', jsonb_build_object('label', pickup_label, 'notes', '', 'weeklyPickupDay', pickup_day, 'pickupDayChangeUsed', false)),
+    jsonb_build_object(
+      'label', coalesce(new.raw_user_meta_data -> 'pickup_location' ->> 'label', pickup_label),
+      'notes', coalesce(new.raw_user_meta_data -> 'pickup_location' ->> 'notes', ''),
+      'weeklyPickupDay', pickup_day,
+      'weeklyPickupDaySelectedAt', coalesce(new.raw_user_meta_data -> 'pickup_location' ->> 'weeklyPickupDaySelectedAt', now()::text),
+      'pickupDayChangeUsed', coalesce((new.raw_user_meta_data -> 'pickup_location' ->> 'pickupDayChangeUsed')::boolean, false)
+    ),
     accepted_version,
     now()
   )

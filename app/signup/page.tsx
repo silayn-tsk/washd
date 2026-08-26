@@ -62,7 +62,7 @@ export default function SignupPage() {
       if (!weeklyPickupDay) throw new Error("PICKUP_DAY_REQUIRED");
       const { data, error: signupError } = await supabase.auth.signUp({
         email: email.trim(), password,
-        options: { emailRedirectTo: `${window.location.origin}/plans`, captchaToken: captchaToken || undefined, data: { name: name.trim(), unit: pickupLabel, pickup_location: { label: residence.trim(), notes: unit.trim(), weeklyPickupDay, pickupDayChangeUsed: false }, terms_accepted: true, terms_version: TERMS_VERSION } },
+        options: { emailRedirectTo: `${window.location.origin}/plans`, captchaToken: captchaToken || undefined, data: { name: name.trim(), unit: pickupLabel, pickup_location: { label: residence.trim(), notes: unit.trim(), weeklyPickupDay, weeklyPickupDaySelectedAt: new Date().toISOString(), pickupDayChangeUsed: false }, terms_accepted: true, terms_version: TERMS_VERSION } },
       });
       if (signupError) throw signupError;
       window.location.assign(data.session ? "/plans" : "/login?signup=check-email");
