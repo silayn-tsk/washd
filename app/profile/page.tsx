@@ -12,7 +12,7 @@ type Profile = {
   name?: string;
   email?: string;
   unit?: string;
-  pickup_location?: { label?: string; notes?: string };
+  pickup_location?: { label?: string; notes?: string; weeklyPickupDay?: string };
 };
 
 export default function ProfilePage() {
@@ -53,7 +53,8 @@ export default function ProfilePage() {
     const { data: savedProfile, error: updateError } = await supabase.from("profiles").update({
       name: name.trim(),
       unit: pickupLabel,
-      pickup_location: { label: residence.trim(), notes: unit.trim() },
+      // Keep the member's fixed weekly pickup day when they update residence details.
+      pickup_location: { ...(profile.pickup_location || {}), label: residence.trim(), notes: unit.trim() },
       updated_at: new Date().toISOString(),
     }).eq("id", user.id).select("member_id, name, email, unit, pickup_location").maybeSingle();
     setSaving(false);

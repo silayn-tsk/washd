@@ -7,7 +7,7 @@ import { useAuth } from "../../auth-provider";
 import { supabase } from "@/lib/supabase";
 import { redirectForAdminMfa, resolveAdminAccess } from "@/lib/admin-access";
 
-type Member = { id: string; member_id: string; name?: string; email?: string; unit?: string };
+type Member = { id: string; member_id: string; name?: string; email?: string; unit?: string; pickup_location?: { weeklyPickupDay?: string } };
 type Bag = { user_id: string; id: string; status: string; updated_at: string };
 type Collection = { user_id: string; due: string; location: string; status: string };
 
@@ -56,7 +56,7 @@ export default function AdminTrackingPage() {
 
   const loadOperations = useCallback(async () => {
     const [memberResult, bagResult, collectionResult] = await Promise.all([
-      supabase.from("profiles").select("id, member_id, name, email, unit").order("member_id"),
+      supabase.from("profiles").select("id, member_id, name, email, unit, pickup_location").order("member_id"),
       supabase.from("bags").select("user_id, id, status, updated_at").order("updated_at", { ascending: false }),
       supabase.from("collections").select("user_id, due, location, status").gte("due", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()).order("due"),
     ]);
@@ -80,6 +80,11 @@ export default function AdminTrackingPage() {
   const selectedMember = members.find((member) => member.id === selectedId);
   const memberBag = useMemo(() => bags.find((bag) => bag.user_id === selectedId), [bags, selectedId]);
   const memberCollection = useMemo(() => collections.find((item) => item.user_id === selectedId), [collections, selectedId]);
+  const weeklyPickupDay = selectedMember?.pickup_location?.weeklyPickupDay === "monday"
+    ? "Monday"
+    : selectedMember?.pickup_location?.weeklyPickupDay === "wednesday"
+      ? "Wednesday"
+      : "Not selected yet";
 
   useEffect(() => {
     if (!selectedMember) return;
@@ -122,7 +127,7 @@ export default function AdminTrackingPage() {
         <section className="tracking-admin-editor">
           <span className="kicker">Live member tracking</span><h1>{selectedMember?.name || "Choose a member"}</h1><p>{selectedMember?.member_id} · {selectedMember?.email}</p>
           {notice && <div className="admin-notice success"><CheckCircle2 size={18} /> {notice}</div>}{error && <div className="admin-notice error"><ShieldAlert size={18} /> {error}</div>}
-          {selectedMember && <div className="tracking-admin-card"><div className="tracking-admin-current"><PackageCheck size={28} /><div><span>Currently visible</span><strong>{memberBag ? trackingStatusLabel(memberBag.status) : "No bag yet"}</strong><small>{memberBag?.id || "Create the first tracking cycle below"}</small></div></div><div className="admin-fields"><label className="admin-field"><span>Bag ID</span><input value={bagId} onChange={(event) => setBagId(event.target.value.toUpperCase())} /></label><label className="admin-field"><span>Live status</span><select value={status} onChange={(event) => setStatus(event.target.value)}>{trackingStatusOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label><label className="admin-field"><span>Expected return</span><input type="datetime-local" value={collectionDue} onChange={(event) => setCollectionDue(event.target.value)} /></label><label className="admin-field"><span>Collection point</span><input value={location} onChange={(event) => setLocation(event.target.value)} /></label></div><div className="tracking-admin-actions"><button type="button" disabled={busy || !memberBag} onClick={() => void saveTracking("empty")}>Mark tracking empty</button></div><div className="tracking-admin-hint"><Clock3 size={17} /> Saving updates the member dashboard instantly and adds a timestamped event to the bag history.</div></div>}
+          {selectedMember && <div className="tracking-admin-card"><div className="tracking-admin-current"><PackageCheck size={28} /><div><span>Currently visible</span><strong>{memberBag ? trackingStatusLabel(memberBag.status) : "No bag yet"}</strong><small>{memberBag?.id || "Create the first tracking cycle below"}</small></div></div><div className="admin-fields"><label className="admin-field"><span>Bag ID</span><input value={bagId} onChange={(event) => setBagId(event.target.value.toUpperCase())} /></label><label className="admin-field"><span>Live status</span><select value={status} onChange={(event) => setStatus(event.target.value)}>{trackingStatusOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label><label className="admin-field"><span>Expected return</span><input type="datetime-local" value={collectionDue} onChange={(event) => setCollectionDue(event.target.value)} /></label><label className="admin-field"><span>Collection point</span><input value={location} onChange={(event) => setLocation(event.target.value)} /></label><label className="admin-field"><span>Weekly pickup day</span><input value={weeklyPickupDay} readOnly aria-readonly="true" /></label></div><div className="tracking-admin-actions"><button type="button" disabled={busy || !memberBag} onClick={() => void saveTracking("empty")}>Mark tracking empty</button></div><div className="tracking-admin-hint"><Clock3 size={17} /> Saving updates the member dashboard instantly and adds a timestamped event to the bag history.</div></div>}
         </section>
       </div>
     </main>
