@@ -1,104 +1,103 @@
 # Washd project handover
 
-Use this file when opening the project on a new laptop or starting a fresh Codex task.
+Updated 2 October 2026. Read this file when moving to a new laptop or continuing the project in a fresh chat.
 
-## What this project is
+## Project and services
 
-Washd is a Malaysian residential laundry membership website. It includes the public website, account/member dashboard, admin content tools, Supabase-backed authentication and Stripe subscription flows.
+Washd is a Malaysian residential laundry membership website with a public frontend, member dashboard, admin tools, Supabase authentication/database, and Stripe subscriptions.
 
-## Important live services
-
-- Public Firebase Hosting URL: `https://washd-my-86c6d.web.app`
-- Intended custom domain: `https://washdmy.com`
+- GitHub repository: `https://github.com/silayn-tsk/washd`
+- GitHub branch: `main`
+- Public domain: `https://washdmy.com`
+- Firebase Hosting URL: `https://washd-my-86c6d.web.app`
 - Firebase project: `kleen-86c6d`
-- Firebase Hosting target: `washd-my-86c6d`
-- Supabase project reference: `egrhyqdrqdaupvxiyurf`
-- Payments: Stripe (currently test/sandbox setup until live keys are deliberately enabled)
+- Firebase Hosting site: `washd-my-86c6d`
+- Supabase project reference: `egrhyqdrqdaupvxiyurf` (the Washd project)
 
-Never store Stripe secret keys, Supabase service keys, Firebase service-account files, or passwords in Git or in this document.
+Moving the source code does not move or erase the hosted Supabase database, Firebase site, Stripe subscriptions, or domain. Existing hosted resources remain in their respective accounts. Payment mode and hosted configuration must be checked in their dashboards; this source transfer does not establish their current state.
 
-## Project structure
+## Current behavior
 
-- `app/` - Next.js pages and UI
-- `app/plans/page.tsx` - plan selection, add-ons, checkout and plan-change flow
-- `app/account/page.tsx` - member dashboard including billing and current membership controls
-- `app/admin/` - admin pages
-- `lib/` - shared content and integration helpers
-- `supabase/functions/` - Supabase Edge Functions for Stripe checkout, billing portal and other backend operations
-- `firebase.json` / `.firebaserc` - Firebase Hosting configuration
-- `.env.local` - local environment settings; keep private and do not commit
+The latest application commit before this transfer was `dd9c529` (26 August 2026).
 
-## Current customer experience
+- New signups must accept the service terms and select Monday or Wednesday for their fixed weekly pickup.
+- Members receive one online change of their pickup day. Further requests go through WhatsApp.
+- The pickup lead rule uses **two calendar days**, rather than an exact elapsed 48 hours: Saturday registration can join Monday; Sunday registration waits until the following Monday. Monday registration can join Wednesday; Tuesday registration waits until the following Wednesday.
+- Routes begin from September 2026 and show the next eligible future collection.
+- Existing members without a chosen pickup day have a blank admin weekly-pickup field and no invented collection date.
+- Admin → Member tracking shows the selected weekly day. Expected return is blank until a day is selected. Suggested returns are Wednesday at 5:30pm for Monday collection and Friday at 5:30pm for Wednesday collection, with manual adjustment available.
+- Member IDs remain fixed across profile updates. A new member's first bag defaults to the matching number, such as `washd12` → `WASHD12`. Existing IDs and tracking history are preserved.
+- Profile/residence edits preserve the pickup-day selection.
+- Plans include editable care clauses, and one-off additional services use WhatsApp support. Recurring add-on selection was removed.
+- Existing subscribers manage membership and billing through Stripe Customer Portal.
+- Managed service information formats plan names with a colon and links to `https://washdmy.com`.
 
-- New members can create an account, accept the terms, choose a plan/add-ons and enter Stripe Checkout.
-- Existing subscribers opening a plan should go to Stripe Customer Portal to manage/change their plan rather than create a duplicate subscription.
-- The Account page has controls to manage billing and change plan through Stripe Customer Portal.
-- Mobile plan add-ons use a bottom-sheet selection experience and a sticky monthly-total bar.
-- Checkout errors are displayed as immediate pop-ups rather than only at the top of the page.
+The supplied conversation reports that the member-ID and required-pickup-day SQL changes were applied through the Supabase SQL Editor, and that the frontend was deployed. These hosted changes were not independently rechecked during the GitHub transfer.
 
-## Important current task: custom-domain support
+## Important files
 
-`washdmy.com` has been pointed to the frontend, but member buttons such as **Current membership** and **Billing** can fail on that domain. The browser is calling Supabase Edge Functions, which currently only allow the old Firebase URL.
+- `app/signup/page.tsx`: required pickup day and account creation.
+- `app/account/page.tsx`: member dashboard, next collection, and one-time day change.
+- `app/profile/page.tsx`: residence/profile editing.
+- `app/admin/tracking/page.tsx`: bag tracking, weekly day, and expected return.
+- `app/admin/page.tsx`: content, plans, clauses, and support settings.
+- `app/plans/page.tsx`: plan selection and checkout/portal flow.
+- `lib/`: shared site content and integration helpers.
+- `supabase/functions/`: Stripe and admin backend functions.
+- `supabase/migrations/`: database changes, including the August 2026 ID and pickup-day fixes.
+- `firebase.json` / `.firebaserc`: hosting configuration.
+- `OPERATIONS_RUNBOOK.md`, `LAUNCH_CHECKLIST.md`, and `QA_REPORT.md`: operations and validation references.
 
-After signing in to the Supabase CLI on the new computer, set these hosted secrets:
+## Starting on a new laptop
 
-```sh
-npx supabase secrets set --project-ref egrhyqdrqdaupvxiyurf \
-  ALLOWED_ORIGINS='https://washdmy.com,https://www.washdmy.com,https://washd-my-86c6d.web.app' \
-  APP_BASE_URL='https://washdmy.com'
-```
-
-Then deploy the affected functions:
-
-```sh
-npx supabase functions deploy create-billing-portal-session create-checkout-session \
-  --project-ref egrhyqdrqdaupvxiyurf
-```
-
-Also add `https://washdmy.com` and `https://www.washdmy.com` to Supabase Auth's Site URL / Redirect URLs in the Supabase dashboard.
-
-## Stripe plan changes still need dashboard configuration
-
-In Stripe Dashboard, configure Customer Portal to allow customers to switch subscription prices. Add the Washd plan products/prices and choose a proration policy before enabling it for real customers. The website can open the portal; Stripe controls the actual plan-change options.
-
-## Starting locally on a new laptop
+Install Git and Node.js 22.13 or newer, then:
 
 ```sh
+git clone https://github.com/silayn-tsk/washd.git ~/washd-site
 cd ~/washd-site
-npm install
+```
+
+Privately copy `.env.local` from the old laptop's transfer backup into this folder before running the website. Alternatively, copy `.env.example` to `.env.local` and fill in the project settings. Never paste private keys into chat or commit environment files. Supabase service-role and Stripe secret keys must never be used in `NEXT_PUBLIC_` variables.
+
+```sh
+npm ci
 npm run dev
 ```
 
-Open the local address shown by the command, normally `http://localhost:3000`.
+Open the local address printed by the development server. The dependency ZIP and generated `out`/`dist` folders are unnecessary; dependencies and builds are recreated from the source and lockfile.
 
-For access to deployment/back-end management, authenticate on the new computer:
+For later updates, commit local work and use `git pull --ff-only` to receive changes. This computer's existing branch is `master`; after the transfer it tracks GitHub's `origin/main`. A fresh clone uses `main`.
 
-```sh
-npx firebase login
-npx supabase login
-```
-
-## Build and deploy
-
-Run checks and build:
+## Validation and Firebase publishing
 
 ```sh
 npm run lint
 npm run build:firebase
+npx firebase-tools login
+npx firebase-tools deploy --only hosting --project kleen-86c6d
 ```
 
-Deploy the website:
+GitHub updates alone do not publish changes to `washdmy.com`. Build and deploy through Firebase when a website change is ready. Recheck production URLs and payment flows after a deployment.
 
-```sh
-firebase deploy --only hosting --project kleen-86c6d
-```
+## Supabase and Stripe management
 
-## Source-control status
+The old laptop had difficulty using the Supabase CLI. SQL changes can instead be run in Supabase Dashboard → Washd → SQL Editor. Paste SQL from the required migration file, not shell commands such as `pbcopy`. Check which changes are already applied before rerunning migrations.
 
-The project has Git history on branch `master`. The most recent commits include mobile add-on selection, immediate checkout error pop-ups, and the Stripe billing-portal plan-change route.
+If billing or membership buttons fail on the custom domain, verify the hosted Edge Function settings:
 
-There is an untracked `node_modules.zip` archive in the project. It is large and not needed on another laptop. Do not commit it.
+- `APP_BASE_URL`: `https://washdmy.com`
+- `ALLOWED_ORIGINS`: includes `https://washdmy.com`, `https://www.washdmy.com`, and `https://washd-my-86c6d.web.app`
+- Supabase Auth Site URL and Redirect URLs allow the customer-facing domain.
+- Stripe Customer Portal allows switching between the intended Washd prices with the chosen proration policy.
 
-## Recommended prompt for a new Codex task
+Deploy affected Edge Functions after changing their code. Existing credentials and account permissions must be available separately; cloning GitHub does not authenticate the new computer to these services.
 
-> Open `/path/to/washd-site`, read `PROJECT_HANDOFF.md`, inspect the current Git status, and continue the Washd website work. Do not expose or commit secrets. First, help me verify the custom-domain CORS and Stripe billing portal flows.
+## Preserving the chat and private configuration
+
+A private transfer-backup folder was created beside the project on the old laptop. It contains the original conversation export, private local environment files, a Git bundle of the repository before synchronization, and restore instructions. Copy that entire folder privately to the new laptop. Its contents are not committed to GitHub.
+
+The conversation export preserves the text context and can be attached to a fresh chat; it does not recreate the original chat in the application's sidebar or recover images referenced only by old temporary paths. Copy any original images or other attachments you need separately.
+
+Suggested continuation prompt:
+
+> Open `~/washd-site`, read `PROJECT_HANDOFF.md`, inspect Git status, and continue the Washd website project. Preserve the current membership, tracking, and two-calendar-day pickup behavior. Keep private configuration out of Git. Ask which change I want next before changing product behavior.

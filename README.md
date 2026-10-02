@@ -2,6 +2,8 @@
 
 Washd is a Malaysian laundry membership website. Its public frontend can remain on Firebase Hosting while Supabase provides authentication, PostgreSQL data, Row Level Security, and Stripe Edge Functions.
 
+For the latest project context and instructions for moving to another laptop, read [PROJECT_HANDOFF.md](PROJECT_HANDOFF.md). Clone `https://github.com/silayn-tsk/washd.git`, restore your private `.env.local`, then run `npm ci` and `npm run dev`.
+
 ## Local configuration
 
 Copy `.env.example` to `.env.local` and add the browser-safe values from the Supabase project API settings:
