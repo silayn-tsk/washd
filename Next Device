@@ -1,0 +1,6 @@
+New device 
+git clone https://github.com/silayn-tsk/washd.git ~/washd-site
+cd ~/washd-site
+
+npm ci
+npm run dev
